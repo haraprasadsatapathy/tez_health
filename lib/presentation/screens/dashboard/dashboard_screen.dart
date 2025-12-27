@@ -7,7 +7,6 @@ import 'package:tez_health/presentation/screens/emergency/emergency_screen.dart'
 import 'package:tez_health/presentation/screens/healthcare/healthcare_screen.dart';
 import 'package:tez_health/presentation/screens/store/store_screen.dart';
 import 'package:tez_health/presentation/screens/academy/academy_screen.dart';
-import 'package:tez_health/presentation/screens/profile/profile_screen.dart';
 import 'package:tez_health/presentation/widgets/sos_button.dart';
 import 'package:tez_health/theme/app_theme.dart';
 
@@ -31,7 +30,6 @@ class DashboardScreen extends StatelessWidget {
               HealthcareScreen(),
               StoreScreen(),
               AcademyScreen(),
-              ProfileScreen(),
             ],
           ),
           bottomNavigationBar: BottomNavigationBar(
@@ -66,10 +64,6 @@ class DashboardScreen extends StatelessWidget {
               BottomNavigationBarItem(
                 icon: Icon(Icons.school),
                 label: 'Academy',
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.person),
-                label: 'Profile',
               ),
             ],
           ),

@@ -10,7 +10,8 @@
       "Bash(dir:*)",
       "Bash(flutter clean:*)",
       "Bash(mkdir:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(rm:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

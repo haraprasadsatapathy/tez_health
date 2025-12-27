@@ -18,7 +18,6 @@ import 'package:tez_health/presentation/screens/store/cart_screen.dart';
 import 'package:tez_health/presentation/screens/academy/academy_screen.dart';
 import 'package:tez_health/presentation/screens/academy/course_details_screen.dart';
 import 'package:tez_health/presentation/screens/academy/certifications_screen.dart';
-import 'package:tez_health/presentation/screens/profile/profile_screen.dart';
 import 'package:tez_health/utils/constants.dart';
 
 class AppRouter {
@@ -117,12 +116,6 @@ class AppRouter {
       GoRoute(
         path: RouteNames.certifications,
         builder: (context, state) => const CertificationsScreen(),
-      ),
-
-      // Profile
-      GoRoute(
-        path: RouteNames.profile,
-        builder: (context, state) => const ProfileScreen(),
       ),
     ],
   );

@@ -1,5 +1,4 @@
 import 'package:get_it/get_it.dart';
-import '../services/local/saved_service.dart';
 import '../services/storage_service.dart';
 import '../services/location_service.dart';
 import '../data/data_source/api_client.dart';
@@ -15,7 +14,6 @@ Future<void> setupDependencyInjection() async {
 
   // Register Services (singletons)
   getIt.registerLazySingleton<ApiClient>(() => ApiClient());
-  getIt.registerLazySingleton<SavedService>(() => SavedService());
   getIt.registerLazySingleton<LocationService>(() => LocationService());
 
   // Register Emergency Repository (singleton)

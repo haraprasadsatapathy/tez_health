@@ -140,31 +140,38 @@ class _SOSButtonState extends State<SOSButton>
 
     return ScaleTransition(
       scale: _pulseAnimation,
-      child: FloatingActionButton.large(
-        onPressed: _isLoading ? null : _onSOSPressed,
-        backgroundColor: AppTheme.alertRed,
-        elevation: 8,
-        child: _isLoading
-            ? const CircularProgressIndicator(color: Colors.white)
-            : const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.emergency,
-                    size: 36,
-                    color: Colors.white,
-                  ),
-                  SizedBox(height: 4),
-                  Text(
-                    'SOS',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
+      child: SizedBox(
+        width: 56,
+        height: 56,
+        child: FloatingActionButton(
+          onPressed: _isLoading ? null : _onSOSPressed,
+          backgroundColor: AppTheme.alertRed,
+          elevation: 8,
+          child: _isLoading
+              ? const CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                )
+              : const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.emergency,
+                      size: 24,
                       color: Colors.white,
                     ),
-                  ),
-                ],
-              ),
+                    SizedBox(height: 2),
+                    Text(
+                      'SOS',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+        ),
       ),
     );
   }
