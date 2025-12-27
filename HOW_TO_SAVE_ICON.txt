@@ -1,0 +1,126 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                  TEZ HEALTH - ICON SETUP GUIDE                   ║
+╚══════════════════════════════════════════════════════════════════╝
+
+📱 YOUR BLUE MEDICAL EMERGENCY ICON
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+STEP 1: SAVE THE ICON IMAGE
+────────────────────────────────────────────────────────────────
+
+The icon you showed (blue medical cross with speed lines) needs to be
+saved in the correct location with the correct name.
+
+📁 SAVE LOCATION:
+   E:\Flutter\Ramesh\tez_health\assets\images\tez_logo.png
+
+📝 FILE NAME (EXACTLY):
+   tez_logo.png
+
+✅ FILE FORMAT:
+   PNG (recommended: with transparent background)
+
+📏 RECOMMENDED SIZE:
+   1024 x 1024 pixels (square)
+
+
+STEP 2: VERIFY THE FILE
+────────────────────────────────────────────────────────────────
+
+Option A - Double-click this file to check:
+   check_icon.bat
+
+Option B - Manually verify:
+   1. Open File Explorer
+   2. Navigate to: E:\Flutter\Ramesh\tez_health\assets\images\
+   3. Look for: tez_logo.png
+   4. Right-click → Properties → Check size (should be 1024x1024 or similar)
+
+
+STEP 3: GENERATE APP ICONS
+────────────────────────────────────────────────────────────────
+
+Option A - Automated (Easiest):
+   Double-click: generate_icons.bat
+
+Option B - Manual:
+   Open Command Prompt in the project folder and run:
+
+   cd E:\Flutter\Ramesh\tez_health
+   flutter pub get
+   flutter pub run flutter_launcher_icons
+
+
+STEP 4: TEST THE APP
+────────────────────────────────────────────────────────────────
+
+   1. Uninstall the old app from your device (if installed)
+   2. Run: flutter clean
+   3. Run: flutter run
+   4. Check your device home screen - you should see the new icon!
+
+
+WHAT WILL BE GENERATED
+────────────────────────────────────────────────────────────────
+
+Android Icons:
+  ✓ Standard icons (48px to 192px - all densities)
+  ✓ Adaptive icon with blue (#007AFF) background
+  ✓ Foreground: Your medical icon
+
+iOS Icons:
+  ✓ All required sizes (20pt to 1024pt)
+  ✓ iPhone icons
+  ✓ iPad icons
+  ✓ Dark mode variants
+  ✓ App Store icon (1024x1024)
+
+
+TROUBLESHOOTING
+────────────────────────────────────────────────────────────────
+
+❌ "File not found" error
+   → Check the file path is exactly:
+     assets/images/tez_logo.png
+   → Make sure filename is lowercase: tez_logo.png (not Tez_Logo.PNG)
+
+❌ Icons not updating on device
+   → Uninstall the app completely
+   → Run: flutter clean
+   → Reinstall the app
+
+❌ Icon looks blurry
+   → Use a higher resolution source image (1024x1024 minimum)
+   → Save as PNG (not JPEG)
+
+❌ Wrong colors
+   → The blue color (#007AFF) is set in pubspec.yaml
+   → Your icon should be blue, which matches perfectly!
+
+
+NEED HELP?
+────────────────────────────────────────────────────────────────
+
+If you don't have the PNG file:
+  1. Take a screenshot of the blue medical icon
+  2. Use an online tool to remove background:
+     - remove.bg
+     - photopea.com
+  3. Resize to 1024x1024
+  4. Save as tez_logo.png
+
+
+CURRENT SETUP
+────────────────────────────────────────────────────────────────
+
+✅ Splash screen updated to use tez_logo.png
+✅ pubspec.yaml configured for icon generation
+✅ Background color set to Trust Blue (#007AFF)
+✅ Adaptive icon enabled for Android
+✅ Dark mode icons enabled for iOS
+
+Everything is ready! Just save your icon and run the generator.
+
+═══════════════════════════════════════════════════════════════════
+
+Made with ❤️ for Tez Health - Fast Emergency Response

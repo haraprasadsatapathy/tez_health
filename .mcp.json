@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "dart-lsp": {
+      "type": "stdio",
+      "command": "dart",
+      "args": ["language-server"],
+      "env": {}
+    }
+  }
+}

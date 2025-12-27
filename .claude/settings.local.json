@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dart --version:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter pub get:*)",
+      "Bash(cat:*)",
+      "Bash(dart run:*)",
+      "Bash(flutter --version:*)",
+      "Bash(dir:*)",
+      "Bash(flutter clean:*)",
+      "Bash(mkdir:*)",
+      "Bash(grep:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "dart-lsp"
+  ]
+}
