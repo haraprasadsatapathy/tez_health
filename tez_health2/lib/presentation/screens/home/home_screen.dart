@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/dependency_injection.dart';
 import '../../../domain/repository/tez_repository.dart';
 import '../../cubit/home/home_bloc.dart';
@@ -89,8 +90,10 @@ class _HomeScreenContent extends StatelessWidget {
                 } else if (state is CategoriesLoaded) {
                   return TopCategoriesSection(
                     categories: state.categories,
-                    onCategoryTap: (categoryId) {
-                      // Navigate to category products
+                    onCategoryTap: (category) {
+                      context.push(
+                        '/products/${category.categoryId}?name=${Uri.encodeComponent(category.name)}',
+                      );
                     },
                   );
                 } else if (state is HomeError) {

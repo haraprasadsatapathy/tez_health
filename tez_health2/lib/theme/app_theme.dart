@@ -97,9 +97,9 @@ class AppTheme {
         backgroundColor: AppColors.tezBlue,
         foregroundColor: AppColors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         textStyle: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -111,9 +111,9 @@ class AppTheme {
         foregroundColor: AppColors.tezBlue,
         side: const BorderSide(color: AppColors.tezBlue),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         textStyle: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -237,9 +237,9 @@ class AppTheme {
         backgroundColor: AppColors.tezBlue,
         foregroundColor: AppColors.white,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         textStyle: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w500,
@@ -251,9 +251,9 @@ class AppTheme {
         foregroundColor: AppColors.tezBlue,
         side: const BorderSide(color: AppColors.tezBlue),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(8),
         ),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         textStyle: GoogleFonts.outfit(
           fontSize: 16,
           fontWeight: FontWeight.w500,

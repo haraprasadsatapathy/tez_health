@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/dependency_injection.dart';
 import '../../../domain/repository/tez_repository.dart';
 import '../../cubit/product/product_bloc.dart';
@@ -37,13 +38,14 @@ class CategoryProductsScreen extends StatelessWidget {
                 );
               }
 
+              final screenWidth = MediaQuery.of(context).size.width;
               return GridView.builder(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(12),
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: _getCrossAxisCount(context),
-                  childAspectRatio: 0.75,
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  childAspectRatio: _getChildAspectRatio(screenWidth),
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
                 itemCount: state.products.length,
                 itemBuilder: (context, index) {
@@ -51,7 +53,7 @@ class CategoryProductsScreen extends StatelessWidget {
                   return ProductCard(
                     product: product,
                     onTap: () {
-                      // Navigate to product details
+                      context.push('/product-details/${product.productId}');
                     },
                   );
                 },
@@ -86,6 +88,22 @@ class CategoryProductsScreen extends StatelessWidget {
     final width = MediaQuery.of(context).size.width;
     if (width >= 1024) return 3;
     if (width >= 768) return 2;
-    return 1;
+    return 2; // Changed from 1 to 2 for better mobile layout
+  }
+
+  double _getChildAspectRatio(double screenWidth) {
+    // Calculate card dimensions to minimize white space
+    final crossAxisCount = screenWidth >= 1024 ? 3 : (screenWidth >= 768 ? 2 : 2);
+    final padding = 12.0 * 2; // left and right padding
+    final spacing = 10.0 * (crossAxisCount - 1); // spacing between cards
+    final cardWidth = (screenWidth - padding - spacing) / crossAxisCount;
+
+    // Calculate card height
+    final imageHeight = cardWidth * 0.75; // Image takes 75% of width
+    final contentHeight = 90.0; // Approximate fixed height for text content
+    final cardHeight = imageHeight + contentHeight;
+
+    // Return aspect ratio (width / height)
+    return cardWidth / cardHeight;
   }
 }

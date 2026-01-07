@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../../../config/dependency_injection.dart';
 import '../../../domain/repository/tez_repository.dart';
 import '../../../theme/app_colors.dart';
@@ -140,11 +141,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             width: double.infinity,
                             child: ElevatedButton(
                               onPressed: () {
-                                // Handle booking
+                                context.push('/book-now/${widget.productId}');
                               },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                               child: const Padding(
-                                padding: EdgeInsets.all(12),
-                                child: Text('Book Now', style: TextStyle(fontSize: 18)),
+                                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                                child: Text('Book Now', style: TextStyle(fontSize: 16)),
                               ),
                             ),
                           ),

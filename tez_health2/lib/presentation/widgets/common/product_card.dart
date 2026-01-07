@@ -22,111 +22,120 @@ class ProductCard extends StatelessWidget {
 
     return Card(
       clipBehavior: Clip.antiAlias,
+      margin: EdgeInsets.zero,
       child: InkWell(
         onTap: onTap,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Product Image
-            AspectRatio(
-              aspectRatio: 16 / 9,
-              child: CachedNetworkImage(
-                imageUrl: product.imageUrl,
-                fit: BoxFit.cover,
-                placeholder: (context, url) => Container(
-                  color: AppColors.gray100,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                ),
-                errorWidget: (context, url, error) => Container(
-                  color: AppColors.gray100,
-                  child: const Icon(Icons.image, color: AppColors.gray400),
-                ),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Product Name
-                  Text(
-                    product.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 4),
-
-                  // Product Description
-                  Text(
-                    product.description,
-                    style: Theme.of(context).textTheme.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Price Section
-                  if (firstVariant != null) ...[
-                    Row(
-                      children: [
-                        // Discounted Price
-                        Flexible(
-                          child: Text(
-                            '₹ ${firstVariant.discountPrice.toStringAsFixed(0)}',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  color: AppColors.tezBlue,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-
-                        // Original Price (if discount exists)
-                        if (hasDiscount) ...[
-                          Flexible(
-                            child: Text(
-                              '₹ ${firstVariant.price.toStringAsFixed(0)}',
-                              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    decoration: TextDecoration.lineThrough,
-                                    color: AppColors.gray500,
-                                  ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          const SizedBox(width: 4),
-
-                          // Discount Badge
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 6,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.green.shade50,
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: Text(
-                              '${discountPercentage.toStringAsFixed(0)}% OFF',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.green.shade700,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Product Image - Fixed height based on card width
+                SizedBox(
+                  height: constraints.maxWidth * 0.75,
+                  width: double.infinity,
+                  child: CachedNetworkImage(
+                    imageUrl: product.imageUrl,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: AppColors.gray100,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
                     ),
-                  ],
-                ],
-              ),
-            ),
-          ],
+                    errorWidget: (context, url, error) => Container(
+                      color: AppColors.gray100,
+                      child: const Icon(Icons.image, color: AppColors.gray400),
+                    ),
+                  ),
+                ),
+
+                // Product Details
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Product Name
+                      Text(
+                        product.name,
+                        style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+
+                      // Product Description
+                      Text(
+                        product.description,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              color: AppColors.gray600,
+                              fontSize: 11,
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Price Section
+                      if (firstVariant != null)
+                        Wrap(
+                          spacing: 6,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          children: [
+                            // Discounted Price
+                            Text(
+                              '₹${firstVariant.discountPrice.toStringAsFixed(0)}',
+                              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    color: AppColors.tezBlue,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                            ),
+
+                            // Original Price (if discount exists)
+                            if (hasDiscount) ...[
+                              Text(
+                                '₹${firstVariant.price.toStringAsFixed(0)}',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      decoration: TextDecoration.lineThrough,
+                                      color: AppColors.gray500,
+                                      fontSize: 11,
+                                    ),
+                              ),
+
+                              // Discount Badge
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.shade50,
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                                child: Text(
+                                  '${discountPercentage.toStringAsFixed(0)}% OFF',
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.green.shade700,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );

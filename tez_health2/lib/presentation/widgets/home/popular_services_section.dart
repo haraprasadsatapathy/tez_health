@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:go_router/go_router.dart';
 import '../../../theme/app_colors.dart';
 import '../../../utils/app_constants.dart';
 
@@ -49,6 +50,7 @@ class PopularServicesSection extends StatelessWidget {
 
   static final List<_ServiceData> _popularServices = [
     const _ServiceData(
+      productId: 'PRD001',
       title: 'Injection service',
       price: '₹ 499',
       image:
@@ -56,6 +58,7 @@ class PopularServicesSection extends StatelessWidget {
       description: 'Essential health checks, blood tests & scans delivered at home.',
     ),
     const _ServiceData(
+      productId: 'PRD002',
       title: 'Ecg at home',
       price: '₹ 799',
       image:
@@ -63,12 +66,14 @@ class PopularServicesSection extends StatelessWidget {
       description: 'Recover mobility with expert in-home physiotherapy sessions.',
     ),
     _ServiceData(
+      productId: 'PRD003',
       title: 'Rabies vaccination',
       price: '₹ 499',
       image: AppConstants.vaccination,
       description: 'Nursing support for elderly, chronic patients, and recovery care.',
     ),
     _ServiceData(
+      productId: 'PRD004',
       title: 'Doctor consultation online',
       price: '₹ 699',
       image: AppConstants.doctorConsultation,
@@ -78,12 +83,14 @@ class PopularServicesSection extends StatelessWidget {
 }
 
 class _ServiceData {
+  final String productId;
   final String title;
   final String price;
   final String image;
   final String description;
 
   const _ServiceData({
+    required this.productId,
     required this.title,
     required this.price,
     required this.image,
@@ -104,66 +111,73 @@ class _ServiceCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: Card(
         clipBehavior: Clip.antiAlias,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Service Image
-            SizedBox(
-              width: 120,
-              height: 120,
-              child: isAssetImage
-                  ? Image.asset(
-                      service.image,
-                      fit: BoxFit.cover,
-                    )
-                  : CachedNetworkImage(
-                      imageUrl: service.image,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        color: AppColors.gray100,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
+        child: InkWell(
+          onTap: () {
+            context.push(
+              '/service-details/${service.productId}?title=${Uri.encodeComponent(service.title)}&price=${Uri.encodeComponent(service.price)}&image=${Uri.encodeComponent(service.image)}&description=${Uri.encodeComponent(service.description)}',
+            );
+          },
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Service Image
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: isAssetImage
+                    ? Image.asset(
+                        service.image,
+                        fit: BoxFit.cover,
+                      )
+                    : CachedNetworkImage(
+                        imageUrl: service.image,
+                        fit: BoxFit.cover,
+                        placeholder: (context, url) => Container(
+                          color: AppColors.gray100,
+                          child: const Center(
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Container(
+                          color: AppColors.gray100,
+                          child: const Icon(Icons.image, color: AppColors.gray400, size: 32),
                         ),
                       ),
-                      errorWidget: (context, url, error) => Container(
-                        color: AppColors.gray100,
-                        child: const Icon(Icons.image, color: AppColors.gray400, size: 32),
-                      ),
-                    ),
-            ),
+              ),
 
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      service.title,
-                      style: Theme.of(context).textTheme.titleMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      service.price,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: AppColors.tezBlue,
-                            fontWeight: FontWeight.bold,
-                          ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      service.description,
-                      style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        service.title,
+                        style: Theme.of(context).textTheme.titleMedium,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        service.price,
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppColors.tezBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        service.description,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

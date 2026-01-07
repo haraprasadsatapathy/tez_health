@@ -5,7 +5,7 @@ import '../common/category_card.dart';
 
 class TopCategoriesSection extends StatelessWidget {
   final List<Category> categories;
-  final Function(String categoryId) onCategoryTap;
+  final Function(Category category) onCategoryTap;
 
   const TopCategoriesSection({
     super.key,
@@ -51,23 +51,10 @@ class TopCategoriesSection extends StatelessWidget {
               final category = displayCategories[index];
               return CategoryCard(
                 category: category,
-                onTap: () => onCategoryTap(category.categoryId),
+                onTap: () => onCategoryTap(category),
               );
             },
           ),
-
-          // View All Button
-          if (categories.length > 5) ...[
-            const SizedBox(height: 24),
-            Center(
-              child: OutlinedButton(
-                onPressed: () {
-                  // Navigate to all categories
-                },
-                child: const Text('View All Categories'),
-              ),
-            ),
-          ],
         ],
       ),
     );
