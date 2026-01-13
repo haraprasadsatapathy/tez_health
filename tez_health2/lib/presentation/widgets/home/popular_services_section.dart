@@ -21,12 +21,12 @@ class PopularServicesSection extends StatelessWidget {
               children: [
                 Text(
                   'Popular Services',
-                  style: Theme.of(context).textTheme.headlineLarge,
+                  style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Our most requested healthcare services',
-                  style: Theme.of(context).textTheme.bodyLarge,
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),

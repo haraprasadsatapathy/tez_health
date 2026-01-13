@@ -46,7 +46,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
           options: CarouselOptions(
             autoPlay: true,
             autoPlayInterval: const Duration(seconds: 4),
-            height: 350,
+            height: 220,
             viewportFraction: 1.0,
             enlargeCenterPage: false,
             onPageChanged: (index, reason) {
@@ -62,7 +62,7 @@ class _HeroCarouselState extends State<HeroCarousel> {
 
         // Indicators
         Positioned(
-          bottom: 20,
+          bottom: 12,
           left: 0,
           right: 0,
           child: Row(
@@ -110,75 +110,81 @@ class _SlideItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final isAssetImage = slide.image.startsWith('assets/');
 
-    return Stack(
-      fit: StackFit.expand,
-      children: [
-        // Background Image
-        if (isAssetImage)
-          Image.asset(
-            slide.image,
-            fit: BoxFit.cover,
-          )
-        else
-          CachedNetworkImage(
-            imageUrl: slide.image,
-            fit: BoxFit.cover,
-            placeholder: (context, url) => Container(
-              color: AppColors.gray100,
-            ),
-            errorWidget: (context, url, error) => Container(
-              color: AppColors.gray100,
-              child: const Icon(Icons.image, size: 50, color: AppColors.gray400),
-            ),
-          ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Background Image
+            if (isAssetImage)
+              Image.asset(
+                slide.image,
+                fit: BoxFit.cover,
+              )
+            else
+              CachedNetworkImage(
+                imageUrl: slide.image,
+                fit: BoxFit.cover,
+                placeholder: (context, url) => Container(
+                  color: AppColors.gray100,
+                ),
+                errorWidget: (context, url, error) => Container(
+                  color: AppColors.gray100,
+                  child: const Icon(Icons.image, size: 50, color: AppColors.gray400),
+                ),
+              ),
 
-        // Gradient Overlay
-        Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withValues(alpha: 0.3),
-                Colors.black.withValues(alpha: 0.6),
-              ],
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.3),
+                    Colors.black.withValues(alpha: 0.6),
+                  ],
+                ),
+              ),
             ),
-          ),
-        ),
 
-        // Content
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                slide.title,
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+            // Content
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    slide.title,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    slide.subtitle,
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                        ),
+                  ),
+                  const SizedBox(height: 16),
+                  TezButton(
+                    text: slide.buttonText,
+                    onPressed: () {
+                      // Navigate to booking or details
+                    },
+                  ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                slide.subtitle,
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w400,
-                    ),
-              ),
-              const SizedBox(height: 32),
-              TezButton(
-                text: slide.buttonText,
-                onPressed: () {
-                  // Navigate to booking or details
-                },
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }

@@ -15,8 +15,7 @@ class TopCategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Limit to 5 categories on home screen
-    final displayCategories = categories.take(5).toList();
+    final displayCategories = categories;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -27,12 +26,12 @@ class TopCategoriesSection extends StatelessWidget {
         children: [
           Text(
             'Top Categories',
-            style: Theme.of(context).textTheme.headlineLarge,
+            style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
           Text(
             'Explore our most popular healthcare services',
-            style: Theme.of(context).textTheme.bodyLarge,
+            style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 24),
 

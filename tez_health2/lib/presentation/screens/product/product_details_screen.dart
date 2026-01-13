@@ -74,38 +74,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                           const SizedBox(height: 16),
 
-                          // Product Description
-                          Text(
-                            product.description,
-                            style: Theme.of(context).textTheme.bodyLarge,
-                          ),
-                          const SizedBox(height: 24),
-
-                          // Variants Selection
-                          if (product.variants.isNotEmpty) ...[
-                            Text(
-                              'Select Variant',
-                              style: Theme.of(context).textTheme.titleLarge,
-                            ),
-                            const SizedBox(height: 12),
-
-                            ...List.generate(product.variants.length, (index) {
-                              final variant = product.variants[index];
-                              return _VariantOption(
-                                variant: variant,
-                                isSelected: _selectedVariantIndex == index,
-                                onTap: () {
-                                  setState(() {
-                                    _selectedVariantIndex = index;
-                                  });
-                                },
-                              );
-                            }),
-                          ],
-
-                          const SizedBox(height: 24),
-
-                          // Price Section
+                          // Price Section (moved here)
                           if (selectedVariant != null) ...[
                             Row(
                               children: [
@@ -133,8 +102,43 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   ),
                               ],
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: 16),
                           ],
+
+                          // Variants Selection (without label)
+                          if (product.variants.isNotEmpty) ...[
+                            // Horizontal Scrollable Variants
+                            SizedBox(
+                              height: 50,
+                              child: ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: product.variants.length,
+                                itemBuilder: (context, index) {
+                                  final variant = product.variants[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.only(right: 12),
+                                    child: _VariantOption(
+                                      variant: variant,
+                                      isSelected: _selectedVariantIndex == index,
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedVariantIndex = index;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+
+                          // Product Description (moved below price)
+                          Text(
+                            product.description,
+                            style: Theme.of(context).textTheme.bodyLarge,
+                          ),
+                          const SizedBox(height: 24),
 
                           // Book Button
                           SizedBox(
@@ -200,53 +204,26 @@ class _VariantOption extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: isSelected ? AppColors.brand50 : null,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(
-                isSelected ? Icons.radio_button_checked : Icons.radio_button_unchecked,
-                color: isSelected ? AppColors.tezBlue : AppColors.gray400,
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      variant.variantName,
-                      style: Theme.of(context).textTheme.titleMedium,
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          '₹ ${variant.discountPrice.toStringAsFixed(0)}',
-                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                color: AppColors.tezBlue,
-                                fontWeight: FontWeight.bold,
-                              ),
-                        ),
-                        if (variant.price > variant.discountPrice) ...[
-                          const SizedBox(width: 8),
-                          Text(
-                            '₹ ${variant.price.toStringAsFixed(0)}',
-                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: AppColors.gray500,
-                                ),
-                          ),
-                        ],
-                      ],
-                    ),
-                  ],
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.tezBlue : Colors.transparent,
+          border: Border.all(
+            color: isSelected ? AppColors.tezBlue : AppColors.gray300,
+            width: 1.5,
+          ),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Center(
+          child: Text(
+            variant.variantName,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: isSelected ? Colors.white : AppColors.gray700,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                 ),
-              ),
-            ],
           ),
         ),
       ),

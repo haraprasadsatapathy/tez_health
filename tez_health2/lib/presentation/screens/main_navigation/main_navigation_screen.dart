@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import '../../../config/dependency_injection.dart';
+import '../../../domain/repository/tez_repository.dart';
 import '../../../theme/app_colors.dart';
 import '../../cubit/tab_navigation/tab_navigation_bloc.dart';
 import '../../cubit/tab_navigation/tab_navigation_event.dart';
 import '../../cubit/tab_navigation/tab_navigation_state.dart';
+import '../../cubit/home/home_bloc.dart';
+import '../../cubit/home/home_event.dart';
+import '../../cubit/categories/categories_bloc.dart';
+import '../../cubit/categories/categories_event.dart';
+import '../../cubit/store/store_bloc.dart';
+import '../../cubit/store/store_event.dart';
 import '../home/home_screen.dart';
 import '../categories/categories_screen.dart';
-import '../suraksha/suraksha_screen.dart';
 import '../store/store_screen.dart';
 
 class MainNavigationScreen extends StatelessWidget {
@@ -15,8 +22,24 @@ class MainNavigationScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => TabNavigationBloc(),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => TabNavigationBloc(),
+        ),
+        BlocProvider(
+          create: (_) => HomeBloc(getIt<TezRepository>())
+            ..add(const FetchCategoriesEvent()),
+        ),
+        BlocProvider(
+          create: (_) => CategoriesBloc(getIt())
+            ..add(const LoadCategoriesEvent()),
+        ),
+        BlocProvider(
+          create: (_) => StoreBloc(getIt())
+            ..add(const LoadStoreEvent()),
+        ),
+      ],
       child: const _MainNavigationScreenContent(),
     );
   }
@@ -35,7 +58,6 @@ class _MainNavigationScreenContentState
   final List<Widget> _screens = const [
     HomeScreen(),
     CategoriesScreen(),
-    SurakshaScreen(),
     StoreScreen(),
   ];
 
@@ -87,14 +109,6 @@ class _MainNavigationScreenContentState
                     _buildNavItem(
                       context: context,
                       index: 2,
-                      icon: Icons.shield_outlined,
-                      activeIcon: Icons.shield,
-                      label: 'Suraksha',
-                      currentIndex: state.currentTabIndex,
-                    ),
-                    _buildNavItem(
-                      context: context,
-                      index: 3,
                       icon: Icons.store_outlined,
                       activeIcon: Icons.store,
                       label: 'Store',

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/dependency_injection.dart';
 import '../../../theme/app_colors.dart';
 import '../../cubit/store/store_bloc.dart';
 import '../../cubit/store/store_event.dart';
@@ -15,10 +14,7 @@ class StoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => StoreBloc(getIt())..add(const LoadStoreEvent()),
-      child: const _StoreScreenContent(),
-    );
+    return const _StoreScreenContent();
   }
 }
 

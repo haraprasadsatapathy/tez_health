@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../../../config/dependency_injection.dart';
 import '../../../theme/app_colors.dart';
 import '../../cubit/categories/categories_bloc.dart';
 import '../../cubit/categories/categories_event.dart';
@@ -15,10 +14,7 @@ class CategoriesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CategoriesBloc(getIt())..add(const LoadCategoriesEvent()),
-      child: const _CategoriesScreenContent(),
-    );
+    return const _CategoriesScreenContent();
   }
 }
 

@@ -4,9 +4,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../config/dependency_injection.dart';
 import '../../../domain/repository/tez_repository.dart';
 import '../../../theme/app_colors.dart';
+import '../../../models/product.dart';
 import '../../cubit/product/product_bloc.dart';
 import '../../cubit/product/product_event.dart';
 import '../../cubit/product/product_state.dart';
+import 'schedule_callback_screen.dart';
 
 class BookNowScreen extends StatelessWidget {
   final String productId;
@@ -28,7 +30,7 @@ class BookNowScreen extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             } else if (state is ProductLoaded) {
               final product = state.product;
-              return _buildBookNowContent(context, product.imageUrl);
+              return _buildBookNowContent(context, product);
             } else if (state is ProductError) {
               return Center(
                 child: Column(
@@ -55,7 +57,7 @@ class BookNowScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBookNowContent(BuildContext context, String imageUrl) {
+  Widget _buildBookNowContent(BuildContext context, Product product) {
     return Column(
       children: [
         Expanded(
@@ -70,7 +72,7 @@ class BookNowScreen extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 16 / 9,
                     child: CachedNetworkImage(
-                      imageUrl: imageUrl,
+                      imageUrl: product.imageUrl,
                       fit: BoxFit.cover,
                       width: double.infinity,
                       placeholder: (context, url) => Container(
@@ -92,9 +94,9 @@ class BookNowScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 32),
 
-                // Title
+                // Product Name
                 Text(
-                  'Speak to our Experts',
+                  product.name,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                         color: AppColors.tezBlue,
@@ -102,20 +104,30 @@ class BookNowScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Description Text 1
+                // Product Description
                 Text(
-                  'Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s.',
+                  product.description,
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                         height: 1.6,
                       ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 24),
 
-                // Description Text 2
+                // Title
                 Text(
-                  'Lorem Ipsum is simply dummy text of the printing and typesetting industry.',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        height: 1.6,
+                  'Speak to our Experts',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                ),
+                const SizedBox(height: 12),
+
+                // Additional Info
+                Text(
+                  'Our healthcare experts are available to answer your questions and help you book the right service for your needs.',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        height: 1.5,
+                        color: AppColors.gray700,
                       ),
                 ),
               ],
@@ -130,7 +142,7 @@ class BookNowScreen extends StatelessWidget {
             color: Theme.of(context).scaffoldBackgroundColor,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 10,
                 offset: const Offset(0, -5),
               ),
@@ -143,8 +155,16 @@ class BookNowScreen extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    // Handle schedule callback
-                    _showScheduleCallbackDialog(context);
+                    // Navigate to schedule callback form
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScheduleCallbackScreen(
+                          productId: productId,
+                          productName: product.name,
+                        ),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
@@ -169,7 +189,7 @@ class BookNowScreen extends StatelessWidget {
                         'Response Time: 2 hours',
                         style:
                             Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.white.withOpacity(0.9),
+                                  color: Colors.white.withValues(alpha: 0.9),
                                 ),
                       ),
                     ],
@@ -228,35 +248,6 @@ class BookNowScreen extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-
-  void _showScheduleCallbackDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Schedule Callback'),
-        content: const Text(
-          'Our experts will call you back within 2 hours. Please make sure your phone is available.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(context);
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Callback scheduled successfully!'),
-                ),
-              );
-            },
-            child: const Text('Confirm'),
-          ),
-        ],
-      ),
     );
   }
 
