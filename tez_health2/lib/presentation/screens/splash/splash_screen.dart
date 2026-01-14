@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import '../../../theme/app_colors.dart';
+import '../../../utils/app_constants.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -13,35 +12,34 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _fadeAnimation;
-  late Animation<double> _scaleAnimation;
+  late Animation<double> _scooterAnimation;
+
+  // Tez Blue color
+  static const Color tezBlue = Color(0xFF3392E0);
 
   @override
   void initState() {
     super.initState();
 
-    // Initialize animations
+    // Initialize animation controller for scooter
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 2500),
     );
 
-    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+    // Scooter movement animation from -40 to 250
+    _scooterAnimation = Tween<double>(
+      begin: -40.0,
+      end: 250.0,
+    ).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Curves.easeIn,
+        curve: Curves.linear,
       ),
     );
 
-    _scaleAnimation = Tween<double>(begin: 0.5, end: 1.0).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: Curves.easeOutBack,
-      ),
-    );
-
-    // Start the animation
-    _animationController.forward();
+    // Repeat animation infinitely
+    _animationController.repeat();
 
     // Navigate to home after 3 seconds
     Future.delayed(const Duration(seconds: 3), () {
@@ -60,98 +58,150 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
+      backgroundColor: tezBlue,
+      body: SafeArea(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Animated Logo
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: ScaleTransition(
-                    scale: _scaleAnimation,
-                    child: Container(
-                      width: 200.w,
-                      height: 200.w,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.r),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.tezBlue.withOpacity(0.2),
-                            blurRadius: 20,
-                            spreadRadius: 5,
+            // Logo and Animation Section (Centered vertically)
+            Expanded(
+              flex: 1,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Image.asset(
+                    AppConstants.logoWhite,
+                    height: 56,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Tagline
+                  const Text(
+                    'Healthcare in minutes !',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Scooter Animation Container
+                  SizedBox(
+                    width: 256,
+                    height: 40,
+                    child: Stack(
+                      children: [
+                        // White line at the bottom
+                        Positioned(
+                          bottom: 0,
+                          left: 0,
+                          right: 0,
+                          child: Container(
+                            height: 2,
+                            color: Colors.white.withValues(alpha: 0.5),
+                          ),
+                        ),
+
+                        // Animated Scooter
+                        AnimatedBuilder(
+                          animation: _scooterAnimation,
+                          builder: (context, child) {
+                            return Transform.translate(
+                              offset: Offset(_scooterAnimation.value, 0),
+                              child: Image.asset(
+                                AppConstants.motorcycle,
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.contain,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            // Bottom Statistics Section
+            Container(
+              margin: const EdgeInsets.only(bottom: 80),
+              child: Column(
+                children: [
+                  // Stats Row
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Left Stat: Customers Served
+                      Column(
+                        children: [
+                          const Text(
+                            '20,000+',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Customers served',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 12,
+                            ),
                           ),
                         ],
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(20.r),
-                        child: Image.asset(
-                          'assets/app_icon/app_icon.jpeg',
-                          fit: BoxFit.contain,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
 
-            SizedBox(height: 30.h),
-
-            // Animated App Name
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Column(
-                    children: [
-                      Text(
-                        'Tez Health',
-                        style: TextStyle(
-                          fontSize: 32.sp,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.tezBlue,
-                          letterSpacing: 1.5,
-                        ),
+                      // Vertical Divider
+                      Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 24),
+                        height: 40,
+                        width: 1,
+                        color: Colors.white,
                       ),
-                      SizedBox(height: 8.h),
-                      Text(
-                        'Your Health, Our Priority',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: AppColors.gray600,
-                          fontWeight: FontWeight.w500,
-                        ),
+
+                      // Right Stat: Google Ratings
+                      Column(
+                        children: [
+                          const Text(
+                            '4.8 ⭐',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 24,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Google Ratings',
+                            style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                );
-              },
-            ),
+                  const SizedBox(height: 16),
 
-            SizedBox(height: 50.h),
-
-            // Loading indicator
-            AnimatedBuilder(
-              animation: _animationController,
-              builder: (context, child) {
-                return FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: SizedBox(
-                    width: 40.w,
-                    height: 40.w,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 3,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        AppColors.tezBlue,
-                      ),
+                  // Copyright Text
+                  Text(
+                    AppConstants.copyright,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.8),
+                      fontSize: 10,
                     ),
                   ),
-                );
-              },
+                ],
+              ),
             ),
           ],
         ),

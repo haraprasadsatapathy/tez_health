@@ -7,6 +7,7 @@ class AppConstants {
   static const String fetchProductsEndpoint = 'tez/FetchProductsDetails';
   static const String fetchProductsByCategoryEndpoint = 'tez/FetchProductsByCategory';
   static const String searchProductsEndpoint = 'tez/SearchProducts';
+  static const String bookingFormDetailEndpoint = 'tez/BookingFormDetail';
 
   // App Info
   static const String appName = 'Tez Health';

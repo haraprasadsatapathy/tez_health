@@ -1,5 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../theme/app_colors.dart';
+import '../../../config/dependency_injection.dart';
+import '../../../domain/repository/tez_repository.dart';
+import '../../cubit/callback/callback_bloc.dart';
+import '../../cubit/callback/callback_event.dart';
+import '../../cubit/callback/callback_state.dart';
 
 class ScheduleCallbackScreen extends StatefulWidget {
   final String productId;
@@ -64,7 +70,7 @@ class _ScheduleCallbackScreenState extends State<ScheduleCallbackScreen> {
     }
   }
 
-  void _submitForm() {
+  void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       if (_selectedDate == null) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -76,50 +82,130 @@ class _ScheduleCallbackScreenState extends State<ScheduleCallbackScreen> {
         return;
       }
 
-      // Handle form submission
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Callback scheduled successfully!'),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // Navigate back after a short delay
-      Future.delayed(const Duration(seconds: 1), () {
-        Navigator.pop(context);
-      });
+      // Dispatch schedule callback event to BLoC
+      context.read<CallbackBloc>().add(
+            ScheduleCallbackEvent(
+              productId: widget.productId,
+              productName: widget.productName,
+              name: _nameController.text,
+              mobile: _mobileController.text,
+              location: _locationController.text,
+              preferredDate: _selectedDate!,
+            ),
+          );
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Schedule Callback'),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header
-              Text(
-                'Request a Callback',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.tezBlue,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Fill in your details and our experts will call you back within 2 hours.',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.gray600,
-                    ),
-              ),
-              const SizedBox(height: 24),
+    return BlocProvider(
+      create: (context) => CallbackBloc(getIt<TezRepository>()),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Schedule Callback'),
+        ),
+        body: BlocListener<CallbackBloc, CallbackState>(
+          listener: (context, state) {
+            if (state is CallbackSuccess) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.green,
+                ),
+              );
+              // Navigate back after showing success message
+              Future.delayed(const Duration(seconds: 2), () {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              });
+            } else if (state is CallbackError) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.message),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          },
+          child: BlocBuilder<CallbackBloc, CallbackState>(
+            builder: (context, state) {
+              final isLoading = state is CallbackLoading;
+
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Informational text at the top
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.tezBlue.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.tezBlue.withValues(alpha: 0.3),
+                            width: 1,
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.info_outline,
+                              color: AppColors.tezBlue,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Expert Consultation',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium
+                                        ?.copyWith(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.tezBlue,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Our healthcare experts are available to help you understand the service better and answer all your queries.',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.gray700,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Header
+                      Text(
+                        'Request a Callback',
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.tezBlue,
+                            ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Fill in your details and our experts will call you back within 2 hours.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppColors.gray600,
+                            ),
+                      ),
+                      const SizedBox(height: 24),
 
               // Name Field
               Text(
@@ -302,27 +388,45 @@ class _ScheduleCallbackScreenState extends State<ScheduleCallbackScreen> {
               ),
               const SizedBox(height: 32),
 
-              // Submit Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _submitForm,
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    'Schedule Callback',
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                      // Submit Button
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: isLoading ? null : () => _submitForm(context),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: isLoading
+                              ? const SizedBox(
+                                  height: 20,
+                                  width: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                )
+                              : Text(
+                                  'Schedule Callback',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
                         ),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-            ],
+              );
+            },
           ),
         ),
       ),

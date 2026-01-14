@@ -2,6 +2,8 @@ import '../../data/api_client/api_client.dart';
 import '../../models/category.dart';
 import '../../models/product.dart';
 import '../../models/search_result.dart';
+import '../../models/booking_request.dart';
+import '../../models/booking_response.dart';
 import '../../utils/app_constants.dart';
 
 class TezRepository {
@@ -90,6 +92,23 @@ class TezRepository {
         (product) => product.productId == productId,
         orElse: () => throw Exception('Product not found'),
       );
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  // Schedule callback
+  Future<BookingResponse> scheduleCallback(BookingRequest request) async {
+    try {
+      final response = await _apiClient.post(
+        AppConstants.bookingFormDetailEndpoint,
+        data: request.toJson(),
+      );
+
+      if (response.data != null) {
+        return BookingResponse.fromJson(response.data);
+      }
+      throw Exception('Invalid response from server');
     } catch (e) {
       rethrow;
     }
