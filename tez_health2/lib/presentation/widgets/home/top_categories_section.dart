@@ -15,7 +15,7 @@ class TopCategoriesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayCategories = categories;
+    final displayCategories = categories.take(6).toList();
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repository/tez_repository.dart';
+import '../../../models/product.dart';
 import 'product_event.dart';
 import 'product_state.dart';
 
@@ -33,7 +34,36 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       emit(const ProductLoading());
       final product = await _repository.getProductById(event.productId);
       if (product != null) {
-        emit(ProductLoaded(product));
+        // Fetch related products - try category first, then all products
+        List<Product> relatedProducts = [];
+        try {
+          // First try to get products from the same category
+          if (product.categoryId.isNotEmpty) {
+            final categoryProducts = await _repository.fetchProductsByCategory(product.categoryId);
+            relatedProducts = categoryProducts
+                .where((p) => p.productId != product.productId)
+                .toList();
+          }
+
+          // If no category products found, fetch all products
+          if (relatedProducts.isEmpty) {
+            final allProducts = await _repository.fetchAllProducts();
+            relatedProducts = allProducts
+                .where((p) => p.productId != product.productId)
+                .toList();
+          }
+        } catch (e) {
+          // If fetching related products fails, try fetching all products
+          try {
+            final allProducts = await _repository.fetchAllProducts();
+            relatedProducts = allProducts
+                .where((p) => p.productId != product.productId)
+                .toList();
+          } catch (_) {
+            relatedProducts = [];
+          }
+        }
+        emit(ProductLoaded(product, relatedProducts: relatedProducts));
       } else {
         emit(const ProductError('Product not found'));
       }

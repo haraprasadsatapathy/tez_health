@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../config/dependency_injection.dart';
 import '../../../domain/repository/tez_repository.dart';
 import '../../../theme/app_colors.dart';
@@ -251,6 +252,13 @@ class BookNowScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _makePhoneCall() async {
+    final Uri phoneUri = Uri(scheme: 'tel', path: '+919343180000');
+    if (await canLaunchUrl(phoneUri)) {
+      await launchUrl(phoneUri);
+    }
+  }
+
   void _showCallNowDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -263,7 +271,7 @@ class BookNowScreen extends StatelessWidget {
             Text('Contact our experts at:'),
             SizedBox(height: 8),
             Text(
-              '+91 1800-XXX-XXXX',
+              '+91 93431 80000',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -279,12 +287,7 @@ class BookNowScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
-              // In a real app, this would trigger a phone call
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Opening phone dialer...'),
-                ),
-              );
+              _makePhoneCall();
             },
             child: const Text('Call'),
           ),
