@@ -5,6 +5,7 @@ class Product extends Equatable {
   final String productId;
   final String name;
   final String description;
+  final String longDescription;
   final String categoryId;
   final String image;
   final String imageUrl;
@@ -14,6 +15,7 @@ class Product extends Equatable {
     required this.productId,
     required this.name,
     required this.description,
+    this.longDescription = '',
     required this.categoryId,
     required this.image,
     required this.imageUrl,
@@ -30,6 +32,7 @@ class Product extends Equatable {
       productId: json['productId'] ?? '',
       name: json['name'] ?? '',
       description: json['description'] ?? '',
+      longDescription: json['longDescription'] ?? '',
       categoryId: json['categoryId'] ?? '',
       image: json['image'] ?? '',
       imageUrl: json['imageUrl'] ?? '',
@@ -42,6 +45,7 @@ class Product extends Equatable {
       'productId': productId,
       'name': name,
       'description': description,
+      'longDescription': longDescription,
       'categoryId': categoryId,
       'image': image,
       'imageUrl': imageUrl,
@@ -56,6 +60,7 @@ class Product extends Equatable {
         productId,
         name,
         description,
+        longDescription,
         categoryId,
         image,
         imageUrl,

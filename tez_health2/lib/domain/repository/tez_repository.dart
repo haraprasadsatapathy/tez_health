@@ -87,11 +87,16 @@ class TezRepository {
   // Get product by ID
   Future<Product?> getProductById(String productId) async {
     try {
-      final products = await fetchAllProducts();
-      return products.firstWhere(
-        (product) => product.productId == productId,
-        orElse: () => throw Exception('Product not found'),
+      final response = await _apiClient.get(
+        AppConstants.fetchProductDetailsByIdEndpoint,
+        queryParameters: {'productid': productId},
       );
+      final data = response.data;
+
+      if (data != null && data['data'] != null) {
+        return Product.fromJson(data['data']);
+      }
+      return null;
     } catch (e) {
       rethrow;
     }

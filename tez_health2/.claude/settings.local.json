@@ -29,7 +29,8 @@
       "Bash(dir \"E:\\\\Ramesh\\\\tez_health\\\\screen_shot\")",
       "Bash(timeout:*)",
       "Bash(ping:*)",
-      "WebFetch(domain:testweb.vmedo.com)"
+      "WebFetch(domain:testweb.vmedo.com)",
+      "Bash(flutter pub add:*)"
     ]
   }
 }

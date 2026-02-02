@@ -6,6 +6,7 @@ class AppConstants {
   static const String fetchCategoriesEndpoint = 'tez/FetchCategoryDetails';
   static const String fetchProductsEndpoint = 'tez/FetchProductsDetails';
   static const String fetchProductsByCategoryEndpoint = 'tez/FetchProductsByCategory';
+  static const String fetchProductDetailsByIdEndpoint = 'tez/FetchProductsDetailsById';
   static const String searchProductsEndpoint = 'tez/SearchProducts';
   static const String bookingFormDetailEndpoint = 'tez/BookingFormDetail';
 

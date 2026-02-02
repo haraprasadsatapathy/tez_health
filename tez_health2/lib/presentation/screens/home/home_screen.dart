@@ -5,6 +5,8 @@ import '../../../models/search_result.dart';
 import '../../cubit/home/home_bloc.dart';
 import '../../cubit/home/home_event.dart';
 import '../../cubit/home/home_state.dart';
+import '../../cubit/tab_navigation/tab_navigation_bloc.dart';
+import '../../cubit/tab_navigation/tab_navigation_event.dart';
 import '../../cubit/theme/theme_cubit.dart';
 import '../../cubit/theme/theme_state.dart';
 import '../../widgets/home/hero_carousel.dart';
@@ -199,6 +201,23 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                     return const SizedBox.shrink();
                   },
                 ),
+
+                      // View More button for categories
+                      Align(
+                        alignment: Alignment.centerRight,
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 16, bottom: 8),
+                          child: OutlinedButton(
+                            onPressed: () {
+                              context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
+                            },
+                            style: OutlinedButton.styleFrom(
+                              shape: const StadiumBorder(),
+                            ),
+                            child: const Text('View More'),
+                          ),
+                        ),
+                      ),
 
                       // Popular Services
                       const PopularServicesSection(),
