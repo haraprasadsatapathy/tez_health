@@ -20,7 +20,7 @@ class ProductDetailsScreen extends StatefulWidget {
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedVariantIndex = 0;
 
   @override
@@ -64,16 +64,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
 
                     Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(14),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           // Product Name
                           Text(
                             product.name,
-                            style: Theme.of(context).textTheme.headlineMedium,
+                            style: Theme.of(context).textTheme.headlineSmall,
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 14),
 
                           // Price Section (moved here)
                           if (selectedVariant != null) ...[
@@ -83,19 +83,19 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   '₹ ${selectedVariant.discountPrice.toStringAsFixed(0)}',
                                   style: Theme.of(context)
                                       .textTheme
-                                      .headlineMedium
+                                      .titleLarge
                                       ?.copyWith(
                                         color: AppColors.tezBlue,
                                         fontWeight: FontWeight.bold,
                                       ),
                                 ),
-                                const SizedBox(width: 12),
+                                const SizedBox(width: 10),
                                 if (selectedVariant.price > selectedVariant.discountPrice)
                                   Text(
                                     '₹ ${selectedVariant.price.toStringAsFixed(0)}',
                                     style: Theme.of(context)
                                         .textTheme
-                                        .titleLarge
+                                        .titleSmall
                                         ?.copyWith(
                                           decoration: TextDecoration.lineThrough,
                                           color: AppColors.gray500,

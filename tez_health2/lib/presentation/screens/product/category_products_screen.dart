@@ -283,26 +283,28 @@ class _ProductListItem extends StatelessWidget {
               const SizedBox(width: 12),
 
               // Right side: Product Image
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: SizedBox(
-                  width: 100,
-                  height: 100,
-                  child: CachedNetworkImage(
-                    imageUrl: product.imageUrl,
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: AppColors.gray100,
-                      child: const Center(
-                        child: CircularProgressIndicator(),
+              Column(
+                children: [
+                  SizedBox(
+                    width: 110,
+                    height: 140,
+                    child: CachedNetworkImage(
+                      imageUrl: product.imageUrl,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Container(
+                        color: AppColors.gray100,
+                        child: const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Container(
+                        color: AppColors.gray100,
+                        child: const Icon(Icons.image, size: 40, color: AppColors.gray400),
                       ),
                     ),
-                    errorWidget: (context, url, error) => Container(
-                      color: AppColors.gray100,
-                      child: const Icon(Icons.image, size: 40, color: AppColors.gray400),
-                    ),
                   ),
-                ),
+
+                ],
               ),
             ],
           ),

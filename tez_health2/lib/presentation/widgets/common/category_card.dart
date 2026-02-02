@@ -42,15 +42,13 @@ class CategoryCard extends StatelessWidget {
 
             // Category Info
             Padding(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     category.name,
                     style: Theme.of(context).textTheme.titleMedium,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 4),
                   Text(

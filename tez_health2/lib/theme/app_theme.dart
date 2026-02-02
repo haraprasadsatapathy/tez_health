@@ -58,7 +58,7 @@ class AppTheme {
       titleLarge: GoogleFonts.outfit(
         fontSize: 20,
         height: 30 / 20,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w700,
         color: AppColors.gray900,
       ),
       titleMedium: GoogleFonts.outfit(
@@ -198,7 +198,7 @@ class AppTheme {
       titleLarge: GoogleFonts.outfit(
         fontSize: 20,
         height: 30 / 20,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w700,
         color: AppColors.gray50,
       ),
       titleMedium: GoogleFonts.outfit(
