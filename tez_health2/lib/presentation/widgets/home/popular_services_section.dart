@@ -24,10 +24,7 @@ class PopularServicesSection extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  'Our most requested healthcare services',
-                  style: Theme.of(context).textTheme.bodyMedium,
-                ),
+
               ],
             ),
           ),

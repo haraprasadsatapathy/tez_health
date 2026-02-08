@@ -21,7 +21,7 @@ class ProductDetailsScreen extends StatefulWidget {
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
 }
 
-class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
+class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   int _selectedVariantIndex = 0;
 
   @override
@@ -76,7 +76,7 @@ class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                           const SizedBox(height: 14),
 
-                          // Price Section (moved here)
+                          // Price Section
                           if (selectedVariant != null) ...[
                             Row(
                               children: [
@@ -86,9 +86,9 @@ class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       .textTheme
                                       .titleLarge
                                       ?.copyWith(
-                                        color: AppColors.tezBlue,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    color: AppColors.tezBlue,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                                 const SizedBox(width: 10),
                                 if (selectedVariant.price > selectedVariant.discountPrice)
@@ -98,20 +98,19 @@ class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         .textTheme
                                         .titleSmall
                                         ?.copyWith(
-                                          decoration: TextDecoration.lineThrough,
-                                          color: AppColors.gray500,
-                                        ),
+                                      decoration: TextDecoration.lineThrough,
+                                      color: AppColors.gray500,
+                                    ),
                                   ),
                               ],
                             ),
                             const SizedBox(height: 16),
                           ],
 
-                          // Variants Selection (without label)
+                          // Variants Selection
                           if (product.variants.isNotEmpty) ...[
-                            // Horizontal Scrollable Variants
                             SizedBox(
-                              height: 50,
+                              height: 40,
                               child: ListView.builder(
                                 scrollDirection: Axis.horizontal,
                                 itemCount: product.variants.length,
@@ -134,25 +133,6 @@ class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             const SizedBox(height: 16),
                           ],
-
-                          // Book Button
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                context.push('/book-now/${widget.productId}');
-                              },
-                              style: ElevatedButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                                child: Text('Book Now', style: TextStyle(fontSize: 16)),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     ),
@@ -168,6 +148,9 @@ class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       _RelatedServicesSection(
                         relatedProducts: state.relatedProducts,
                       ),
+
+                    // Add space for footer button
+                    const SizedBox(height: 80),
                   ],
                 ),
               );
@@ -193,11 +176,54 @@ class  _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             return const SizedBox.shrink();
           },
         ),
+
+        // Footer with Book Now Button
+        bottomNavigationBar: BlocBuilder<ProductBloc, ProductState>(
+          builder: (context, state) {
+            if (state is ProductLoaded) {
+              return Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        context.push('/book-now/${widget.productId}');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                      child: const Text(
+                        'Book Now',
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
 }
 
+// Rest of the classes remain the same...
 class _VariantOption extends StatelessWidget {
   final ProductVariant variant;
   final bool isSelected;
@@ -215,7 +241,7 @@ class _VariantOption extends StatelessWidget {
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 2),
         decoration: BoxDecoration(
           color: Colors.white,
           border: Border.all(
@@ -227,10 +253,10 @@ class _VariantOption extends StatelessWidget {
         child: Center(
           child: Text(
             variant.variantName,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.tezBlue,
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                ),
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+              color: AppColors.tezBlue,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
           ),
         ),
       ),
@@ -257,12 +283,9 @@ class _ServiceDetailsSectionState extends State<_ServiceDetailsSection> {
   @override
   Widget build(BuildContext context) {
     final textStyle = Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: Colors.grey[600],
-          height: 1.5,
-        );
-    final headerStyle = Theme.of(context).textTheme.titleSmall?.copyWith(
-          fontWeight: FontWeight.bold,
-        );
+      color: Colors.grey[600],
+      height: 1.5,
+    );
 
     return Container(
       width: double.infinity,
@@ -275,8 +298,6 @@ class _ServiceDetailsSectionState extends State<_ServiceDetailsSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Text('Service Details', style: headerStyle),
-          // const SizedBox(height: 8),
           if (!_isExpanded)
             Text(
               widget.description,
@@ -298,12 +319,14 @@ class _ServiceDetailsSectionState extends State<_ServiceDetailsSection> {
                 _isExpanded = !_isExpanded;
               });
             },
-            child: Text(
-              _isExpanded ? 'View Less' : 'View More',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.tezBlue,
-                    fontWeight: FontWeight.w500,
-                  ),
+            child: Center(
+              child: Text(
+                _isExpanded ? 'View Less' : 'View More',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.tezBlue,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
         ],
@@ -337,8 +360,8 @@ class _RelatedServicesSection extends StatelessWidget {
           Text(
             'Related Services:',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
+              fontWeight: FontWeight.bold,
+            ),
           ),
           const SizedBox(height: 16),
           GridView.builder(
@@ -384,7 +407,6 @@ class _RelatedServiceCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Product Image
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
               child: AspectRatio(
@@ -405,30 +427,27 @@ class _RelatedServiceCard extends StatelessWidget {
                 ),
               ),
             ),
-            // Product Details
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Product Name
                     Text(
                       product.name,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
+                        fontWeight: FontWeight.w600,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const Spacer(),
-                    // Price Section
                     if (firstVariant != null)
                       Text(
                         '₹${firstVariant.discountPrice.toStringAsFixed(0)}',
                         style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                   ],
                 ),

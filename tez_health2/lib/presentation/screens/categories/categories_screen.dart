@@ -178,9 +178,9 @@ class _CategoriesScreenContentState extends State<_CategoriesScreenContent> {
                   child: GridView.builder(
                     padding: EdgeInsets.symmetric(horizontal: 16.w),
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12.w,
-                      mainAxisSpacing: 12.h,
+                      crossAxisCount: 3,
+                      crossAxisSpacing: 3.w,
+                      mainAxisSpacing: 3.h,
                       childAspectRatio: 0.85,
                     ),
                     itemCount: state.filteredCategories.length,

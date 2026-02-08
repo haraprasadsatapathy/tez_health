@@ -6,11 +6,13 @@ import '../common/category_card.dart';
 class TopCategoriesSection extends StatelessWidget {
   final List<Category> categories;
   final Function(Category category) onCategoryTap;
+  final Function() onViewMoreTap;
 
   const TopCategoriesSection({
     super.key,
     required this.categories,
     required this.onCategoryTap,
+    required this.onViewMoreTap,
   });
 
   @override
@@ -23,18 +25,47 @@ class TopCategoriesSection extends StatelessWidget {
       color: isDark ? AppColors.gray900 : AppColors.gray50,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Top Categories',
+        children:
+        [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Top Categories',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 16, bottom: 8),
+                  child: ElevatedButton(
+                    onPressed: () => onViewMoreTap(),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue, // Your desired color
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8), // Square with slight rounding
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                    ),
+                    child: Text(
+                      'View More',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                  ),
+                  // child: OutlinedButton(
+                  //   onPressed: () => onViewMoreTap(),
+                  //   style: OutlinedButton.styleFrom(
+                  //     shape:  StadiumBorder(side: BorderSide()),
+                  //   ),
+                  //   child: const Text('View More'),
+                  // ),
+                ),
+              ),
+            ],
+          ),
 
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Explore our most popular healthcare services',
-            style: Theme.of(context).textTheme.bodyMedium,
-          ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 15),
 
           // Categories Grid
           GridView.builder(

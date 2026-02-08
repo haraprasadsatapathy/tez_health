@@ -7,11 +7,7 @@ class CategoryCard extends StatelessWidget {
   final Category category;
   final VoidCallback onTap;
 
-  const CategoryCard({
-    super.key,
-    required this.category,
-    required this.onTap,
-  });
+  const CategoryCard({super.key, required this.category, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -29,9 +25,7 @@ class CategoryCard extends StatelessWidget {
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Container(
                   color: AppColors.gray100,
-                  child: const Center(
-                    child: CircularProgressIndicator(),
-                  ),
+                  child: const Center(child: CircularProgressIndicator()),
                 ),
                 errorWidget: (context, url, error) => Container(
                   color: AppColors.gray100,
@@ -50,12 +44,21 @@ class CategoryCard extends StatelessWidget {
                     category.name,
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    category.description,
-                    style: Theme.of(context).textTheme.bodySmall,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+
+                  Row
+                    (
+                    children: [Image.asset(
+                      'assets/images/lightning.png',
+                      width: 30,
+                      height: 30,
+                    ),
+                      Text(
+                        category.description,
+                        style: Theme.of(context).textTheme.bodySmall,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
                   ),
                 ],
               ),

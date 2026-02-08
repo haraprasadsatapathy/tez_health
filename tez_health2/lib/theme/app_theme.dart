@@ -190,8 +190,8 @@ class AppTheme {
         color: AppColors.gray50,
       ),
       headlineSmall: GoogleFonts.outfit(
-        fontSize: 24,
-        height: 32 / 24,
+        fontSize: 20,
+        height: 27 / 24,
         fontWeight: FontWeight.w600,
         color: AppColors.gray50,
       ),

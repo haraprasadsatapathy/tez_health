@@ -168,6 +168,9 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                     } else if (state is CategoriesLoaded) {
                       return TopCategoriesSection(
                         categories: state.categories,
+                        onViewMoreTap: (){
+                          context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
+                        },
                         onCategoryTap: (category) {
                           context.push(
                             '/products/${category.categoryId}?name=${Uri.encodeComponent(category.name)}',
@@ -202,22 +205,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                   },
                 ),
 
-                      // View More button for categories
-                      Align(
-                        alignment: Alignment.centerRight,
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 16, bottom: 8),
-                          child: OutlinedButton(
-                            onPressed: () {
-                              context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
-                            },
-                            style: OutlinedButton.styleFrom(
-                              shape: const StadiumBorder(),
-                            ),
-                            child: const Text('View More'),
-                          ),
-                        ),
-                      ),
+
 
                       // Popular Services
                       const PopularServicesSection(),
