@@ -7,33 +7,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final TezRepository _repository;
 
   HomeBloc(this._repository) : super(const HomeInitial()) {
-    on<FetchCategoriesEvent>(_onFetchCategories);
+    on<FetchHomeDataEvent>(_onFetchHomeData);
     on<SearchProductsEvent>(_onSearchProducts);
-    // on<FetchPopularServiceEvent>(_onPopularService);
   }
 
-  Future<void> _onFetchCategories(
-    FetchCategoriesEvent event,
+  Future<void> _onFetchHomeData(
+    FetchHomeDataEvent event,
     Emitter<HomeState> emit,
   ) async {
     try {
       emit(const HomeLoading());
-      final categories = await _repository.fetchCategories();
-      final popularService = await _repository.fetchPopularService();
-      emit(CategoriesLoaded(categories,popularService));
-    } catch (e) {
-      emit(HomeError(e.toString()));
-    }
-  }
+      final categoriesFuture = _repository.fetchCategories();
+      final popularServicesFuture = _repository.fetchPopularService();
 
-  Future<void> _onPopularService(
-    FetchPopularServiceEvent event,
-    Emitter<HomeState> emit,
-  ) async {
-    try {
-      emit(const HomeLoading());
-      final popularService = await _repository.fetchPopularService();
-      emit(PopularServiceDataLoaded(popularService));
+      final categories = await categoriesFuture;
+      final popularServices = await popularServicesFuture;
+
+      emit(HomeDataLoaded(
+        categories: categories,
+        popularServices: popularServices,
+      ));
     } catch (e) {
       emit(HomeError(e.toString()));
     }

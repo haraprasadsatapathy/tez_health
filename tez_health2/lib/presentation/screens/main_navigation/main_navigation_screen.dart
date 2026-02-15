@@ -30,7 +30,7 @@ class MainNavigationScreen extends StatelessWidget {
         ),
         BlocProvider(
           create: (_) => HomeBloc(getIt<TezRepository>())
-            ..add(const FetchCategoriesEvent()),
+            ..add(const FetchHomeDataEvent()),
         ),
         BlocProvider(
           create: (_) => CategoriesBloc(getIt())

@@ -1,14 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:go_router/go_router.dart';
+import '../../../models/popular_service_response.dart';
 import '../../../theme/app_colors.dart';
-import '../../../utils/app_constants.dart';
 
 class PopularServicesSection extends StatelessWidget {
-  const PopularServicesSection({super.key});
+  final List<PopularServiceData> popularServices;
+
+  const PopularServicesSection({
+    super.key,
+    required this.popularServices,
+  });
 
   @override
   Widget build(BuildContext context) {
+    if (popularServices.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 40),
       child: Column(
@@ -24,85 +33,49 @@ class PopularServicesSection extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
                 const SizedBox(height: 8),
-
               ],
             ),
           ),
           const SizedBox(height: 24),
 
-          // Vertical Scrollable List
           ListView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _popularServices.length,
+            itemCount: popularServices.length,
             itemBuilder: (context, index) {
-              return _ServiceCard(service: _popularServices[index]);
+              return _ServiceCard(service: popularServices[index]);
             },
           ),
         ],
       ),
     );
   }
-
-  static final List<_ServiceData> _popularServices = [
-    const _ServiceData(
-      productId: 'PRD001',
-      title: 'Injection service',
-      price: '₹ 499',
-      image:
-          'https://images.unsplash.com/photo-1550831107-1553da8c8464?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-      description: 'Essential health checks, blood tests & scans delivered at home.',
-    ),
-    const _ServiceData(
-      productId: 'PRD002',
-      title: 'Ecg at home',
-      price: '₹ 799',
-      image:
-          'https://images.unsplash.com/photo-1599058917212-d750089bc07e?auto=format&fit=crop&w=800&q=80',
-      description: 'Recover mobility with expert in-home physiotherapy sessions.',
-    ),
-    _ServiceData(
-      productId: 'PRD003',
-      title: 'Rabies vaccination',
-      price: '₹ 499',
-      image: AppConstants.vaccination,
-      description: 'Nursing support for elderly, chronic patients, and recovery care.',
-    ),
-    _ServiceData(
-      productId: 'PRD004',
-      title: 'Doctor consultation online',
-      price: '₹ 699',
-      image: AppConstants.doctorConsultation,
-      description: 'Skilled post-op nursing and wound care at home for smooth recovery.',
-    ),
-  ];
-}
-
-class _ServiceData {
-  final String productId;
-  final String title;
-  final String price;
-  final String image;
-  final String description;
-
-  const _ServiceData({
-    required this.productId,
-    required this.title,
-    required this.price,
-    required this.image,
-    required this.description,
-  });
 }
 
 class _ServiceCard extends StatelessWidget {
-  final _ServiceData service;
+  final PopularServiceData service;
 
   const _ServiceCard({required this.service});
 
+  String _getPrice() {
+    if (service.variants != null && service.variants!.isNotEmpty) {
+      final variant = service.variants!.first;
+      if (variant.discountPrice != null && variant.discountPrice! > 0) {
+        return '₹ ${variant.discountPrice}';
+      }
+      if (variant.price != null) {
+        return '₹ ${variant.price}';
+      }
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isAssetImage = service.image.startsWith('assets/');
+    final imageUrl = service.imageUrl ?? '';
+    final isAssetImage = imageUrl.startsWith('assets/');
+    final price = _getPrice();
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -110,9 +83,7 @@ class _ServiceCard extends StatelessWidget {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: () {
-            context.push(
-              '/service-details/${service.productId}?title=${Uri.encodeComponent(service.title)}&price=${Uri.encodeComponent(service.price)}&image=${Uri.encodeComponent(service.image)}&description=${Uri.encodeComponent(service.description)}',
-            );
+            context.push('/product-details/${service.productId}');
           },
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,25 +92,30 @@ class _ServiceCard extends StatelessWidget {
               SizedBox(
                 width: 120,
                 height: 120,
-                child: isAssetImage
-                    ? Image.asset(
-                        service.image,
-                        fit: BoxFit.cover,
+                child: imageUrl.isEmpty
+                    ? Container(
+                        color: AppColors.gray100,
+                        child: const Icon(Icons.medical_services, color: AppColors.gray400, size: 32),
                       )
-                    : CachedNetworkImage(
-                        imageUrl: service.image,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) => Container(
-                          color: AppColors.gray100,
-                          child: const Center(
-                            child: CircularProgressIndicator(),
+                    : isAssetImage
+                        ? Image.asset(
+                            imageUrl,
+                            fit: BoxFit.cover,
+                          )
+                        : CachedNetworkImage(
+                            imageUrl: imageUrl,
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Container(
+                              color: AppColors.gray100,
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            ),
+                            errorWidget: (context, url, error) => Container(
+                              color: AppColors.gray100,
+                              child: const Icon(Icons.image, color: AppColors.gray400, size: 32),
+                            ),
                           ),
-                        ),
-                        errorWidget: (context, url, error) => Container(
-                          color: AppColors.gray100,
-                          child: const Icon(Icons.image, color: AppColors.gray400, size: 32),
-                        ),
-                      ),
               ),
 
               Expanded(
@@ -149,26 +125,30 @@ class _ServiceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        service.title,
+                        service.name ?? '',
                         style: Theme.of(context).textTheme.titleMedium,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        service.price,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: AppColors.tezBlue,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        service.description,
-                        style: Theme.of(context).textTheme.bodySmall,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
+                      if (price.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          price,
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                                color: AppColors.tezBlue,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
+                      ],
+                      if (service.description != null && service.description!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          service.description!,
+                          style: Theme.of(context).textTheme.bodySmall,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
                   ),
                 ),

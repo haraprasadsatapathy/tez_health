@@ -85,7 +85,7 @@ class PopularServiceData {
 
 class Variants {
   String? variantId;
-  Null? productId;
+  String? productId;
   String? variantName;
   int? price;
   int? discountPrice;
@@ -101,8 +101,8 @@ class Variants {
     variantId = json['variantId'];
     productId = json['productId'];
     variantName = json['variantName'];
-    price = json['price'];
-    discountPrice = json['discountPrice'];
+    price = (json['price'] as num?)?.toInt();
+    discountPrice = (json['discountPrice'] as num?)?.toInt();
   }
 
   Map<String, dynamic> toJson() {

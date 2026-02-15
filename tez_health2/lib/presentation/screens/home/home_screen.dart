@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import '../../../models/popular_service_response.dart';
 import '../../../models/search_result.dart';
 import '../../cubit/home/home_bloc.dart';
 import '../../cubit/home/home_event.dart';
@@ -35,7 +34,6 @@ class _HomeScreenContent extends StatefulWidget {
 class _HomeScreenContentState extends State<_HomeScreenContent> {
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
-  List<PopularServiceData> listPopularServiceData=[];
 
   @override
   void dispose() {
@@ -47,8 +45,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
     setState(() {
       if (value.isEmpty) {
         _isSearching = false;
-        context.read<HomeBloc>().add(const FetchCategoriesEvent());
-        context.read<HomeBloc>().add(const FetchPopularServiceEvent());
+        context.read<HomeBloc>().add(const FetchHomeDataEvent());
       } else {
         _isSearching = true;
         context.read<HomeBloc>().add(SearchProductsEvent(value));
@@ -146,118 +143,81 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           Expanded(
             child: BlocBuilder<HomeBloc, HomeState>(
               builder: (context, state) {
-                if(state is HomeInitial){
-                  context.read<HomeBloc>().add(const FetchCategoriesEvent());
-                  context.read<HomeBloc>().add(const FetchPopularServiceEvent());
+                if (state is HomeInitial) {
+                  context.read<HomeBloc>().add(const FetchHomeDataEvent());
                 }
                 // Show search results when searching
                 if (_isSearching && state is SearchResultsLoaded) {
                   return _buildSearchResults(state.results);
                 }
 
-                // Show normal home content
-                return SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      // Hero Carousel
-                      const HeroCarousel(),
+                if (state is HomeLoading) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-                // Top Categories Section
-                BlocBuilder<HomeBloc, HomeState>(
-                  builder: (context, state) {
-                    if (state is HomeLoading) {
-                      return const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(40),
-                          child: CircularProgressIndicator(),
-                        ),
-                      );
-                    } else if (state is CategoriesLoaded) {
-                      return Column(
+                if (state is HomeError) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(40),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          TopCategoriesSection(
-                            categories: state.categories,
-                            onViewMoreTap: (){
-                              context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
-                            },
-                            onCategoryTap: (category) {
-                              context.push(
-                                '/products/${category.categoryId}?name=${Uri.encodeComponent(category.name)}',
+                          Text(
+                            'Failed to load data',
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            state.message,
+                            style: Theme.of(context).textTheme.bodySmall,
+                            textAlign: TextAlign.center,
+                          ),
+                          const SizedBox(height: 16),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<HomeBloc>().add(
+                                const FetchHomeDataEvent(),
                               );
                             },
+                            child: const Text('Retry'),
                           ),
-                          const PopularServicesSection(),
                         ],
-                      );
-                    } else if (state is PopularServiceDataLoaded) {
-                      return Column(
-                        children: [
-                          const PopularServicesSection(),
-                        ],
-                      );
-                    }else if (state is HomeError) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.all(40),
-                          child: Column(
-                            children: [
-                              Text(
-                                'Failed to load categories',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () {
-                                  context.read<HomeBloc>().add(
-                                    const FetchCategoriesEvent(),
-                                  );
-                                },
-                                child: const Text('Retry'),
-                              ),
-                            ],
-                          ),
+                      ),
+                    ),
+                  );
+                }
+
+                if (state is HomeDataLoaded) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Hero Carousel
+                        const HeroCarousel(),
+                        // Top Categories Section
+                        TopCategoriesSection(
+                          categories: state.categories,
+                          onViewMoreTap: () {
+                            context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
+                          },
+                          onCategoryTap: (category) {
+                            context.push(
+                              '/products/${category.categoryId}?name=${Uri.encodeComponent(category.name)}',
+                            );
+                          },
                         ),
-                      );
-                    }
-                    return const SizedBox.shrink();
-                  },
-                ),
+                        // Popular Services Section
+                        PopularServicesSection(
+                          popularServices: state.popularServices,
+                        ),
+                      ],
+                    ),
+                  );
+                }
 
-
-
-                      // Popular Services
-
-                  // From anywhere in your app
-
-                      // Why Tez Health
-                      // const WhyTezHealthSection(),
-
-                      // Reviews
-                      // const ReviewsSection(),
-
-                      // Footer
-                      // Container(
-                      //   padding: const EdgeInsets.all(24),
-                      //   color: AppColors.gray900,
-                      //   child: Column(
-                      //     children: [
-                      //       Row(
-                      //         mainAxisAlignment: MainAxisAlignment.center,
-                      //         children: [Image.asset(AppConstants.logoWhite, height: 36)],
-                      //       ),
-                      //       const SizedBox(height: 16),
-                      //       Text(
-                      //         AppConstants.copyright,
-                      //         style: Theme.of(
-                      //           context,
-                      //         ).textTheme.bodyMedium?.copyWith(color: AppColors.gray400),
-                      //       ),
-                      //     ],
-                      //   ),
-                      // ),
-                    ],
-                  ),
-                );
+                // Show normal home content
+                return const SizedBox.shrink();
               },
             ),
           ),

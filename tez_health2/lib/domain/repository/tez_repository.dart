@@ -32,9 +32,9 @@ class TezRepository {
       final response = await _apiClient.get(AppConstants.fetchPopularServiceEndpoint);
       final data = response.data;
 
-      if (data != null && data['objret'] != null) {
-        final List<dynamic> categoriesJson = data['objret'];
-        return categoriesJson.map((json) => PopularServiceData.fromJson(json)).toList();
+      if (data != null && data['data'] != null) {
+        final List<dynamic> servicesJson = data['data'];
+        return servicesJson.map((json) => PopularServiceData.fromJson(json)).toList();
       }
       return [];
     } catch (e) {

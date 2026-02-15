@@ -4,12 +4,8 @@ abstract class HomeEvent extends BaseEventState {
   const HomeEvent();
 }
 
-class FetchPopularServiceEvent extends HomeEvent {
-  const FetchPopularServiceEvent();
-}
-
-class FetchCategoriesEvent extends HomeEvent {
-  const FetchCategoriesEvent();
+class FetchHomeDataEvent extends HomeEvent {
+  const FetchHomeDataEvent();
 }
 
 class SearchProductsEvent extends HomeEvent {

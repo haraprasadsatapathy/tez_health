@@ -15,21 +15,27 @@ class HomeLoading extends HomeState {
   const HomeLoading();
 }
 
-class CategoriesLoaded extends HomeState {
+class HomeDataLoaded extends HomeState {
   final List<Category> categories;
-  final List<PopularServiceData> popularServiceData;
-  const CategoriesLoaded(this.categories,this.popularServiceData);
+  final List<PopularServiceData> popularServices;
 
+  const HomeDataLoaded({
+    required this.categories,
+    required this.popularServices,
+  });
 
-}
-
-class PopularServiceDataLoaded extends HomeState {
-  final List<PopularServiceData> popularServiceData;
-
-  const PopularServiceDataLoaded(this.popularServiceData);
+  HomeDataLoaded copyWith({
+    List<Category>? categories,
+    List<PopularServiceData>? popularServices,
+  }) {
+    return HomeDataLoaded(
+      categories: categories ?? this.categories,
+      popularServices: popularServices ?? this.popularServices,
+    );
+  }
 
   @override
-  List<Object?> get props => [PopularServiceData];
+  List<Object?> get props => [categories, popularServices];
 }
 
 class SearchResultsLoaded extends HomeState {
