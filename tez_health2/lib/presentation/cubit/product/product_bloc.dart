@@ -10,8 +10,10 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   ProductBloc(this._repository) : super(const ProductInitial()) {
     on<FetchProductsByCategoryEvent>(_onFetchProductsByCategory);
     on<FetchProductByIdEvent>(_onFetchProductById);
-    on<FetchAllProductsEvent>(_onFetchAllProducts);
+    // on<FetchAllProductsEvent>(_onFetchAllProducts);
   }
+  // From anywhere in your app
+
 
   Future<void> _onFetchProductsByCategory(
     FetchProductsByCategoryEvent event,
@@ -38,30 +40,30 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         List<Product> relatedProducts = [];
         try {
           // First try to get products from the same category
-          if (product.categoryId.isNotEmpty) {
-            final categoryProducts = await _repository.fetchProductsByCategory(product.categoryId);
+          if (product.categoryId!.isNotEmpty) {
+            final categoryProducts = await _repository.fetchProductsByCategory(product.categoryId!);
             relatedProducts = categoryProducts
                 .where((p) => p.productId != product.productId)
                 .toList();
           }
 
           // If no category products found, fetch all products
-          if (relatedProducts.isEmpty) {
-            final allProducts = await _repository.fetchAllProducts();
-            relatedProducts = allProducts
-                .where((p) => p.productId != product.productId)
-                .toList();
-          }
+          // if (relatedProducts.isEmpty) {
+          //   final allProducts = await _repository.fetchAllProducts();
+          //   relatedProducts = allProducts
+          //       .where((p) => p.productId != product.productId)
+          //       .toList();
+          // }
         } catch (e) {
           // If fetching related products fails, try fetching all products
-          try {
-            final allProducts = await _repository.fetchAllProducts();
-            relatedProducts = allProducts
-                .where((p) => p.productId != product.productId)
-                .toList();
-          } catch (_) {
-            relatedProducts = [];
-          }
+          // try {
+          //   final allProducts = await _repository.fetchAllProducts();
+          //   relatedProducts = allProducts
+          //       .where((p) => p.productId != product.productId)
+          //       .toList();
+          // } catch (_) {
+          //   relatedProducts = [];
+          // }
         }
         emit(ProductLoaded(product, relatedProducts: relatedProducts));
       } else {
@@ -72,16 +74,16 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     }
   }
 
-  Future<void> _onFetchAllProducts(
-    FetchAllProductsEvent event,
-    Emitter<ProductState> emit,
-  ) async {
-    try {
-      emit(const ProductLoading());
-      final products = await _repository.fetchAllProducts();
-      emit(ProductsLoaded(products));
-    } catch (e) {
-      emit(ProductError(e.toString()));
-    }
-  }
+  // Future<void> _onFetchAllProducts(
+  //   FetchAllProductsEvent event,
+  //   Emitter<ProductState> emit,
+  // ) async {
+  //   try {
+  //     emit(const ProductLoading());
+  //     final products = await _repository.fetchAllProducts();
+  //     emit(ProductsLoaded(products));
+  //   } catch (e) {
+  //     emit(ProductError(e.toString()));
+  //   }
+  // }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import '../../../models/popular_service_response.dart';
 import '../../../models/search_result.dart';
 import '../../cubit/home/home_bloc.dart';
 import '../../cubit/home/home_event.dart';
@@ -34,6 +35,7 @@ class _HomeScreenContent extends StatefulWidget {
 class _HomeScreenContentState extends State<_HomeScreenContent> {
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
+  List<PopularServiceData> listPopularServiceData=[];
 
   @override
   void dispose() {
@@ -46,6 +48,7 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
       if (value.isEmpty) {
         _isSearching = false;
         context.read<HomeBloc>().add(const FetchCategoriesEvent());
+        context.read<HomeBloc>().add(const FetchPopularServiceEvent());
       } else {
         _isSearching = true;
         context.read<HomeBloc>().add(SearchProductsEvent(value));
@@ -143,6 +146,10 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
           Expanded(
             child: BlocBuilder<HomeBloc, HomeState>(
               builder: (context, state) {
+                if(state is HomeInitial){
+                  context.read<HomeBloc>().add(const FetchCategoriesEvent());
+                  context.read<HomeBloc>().add(const FetchPopularServiceEvent());
+                }
                 // Show search results when searching
                 if (_isSearching && state is SearchResultsLoaded) {
                   return _buildSearchResults(state.results);
@@ -166,18 +173,29 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
                         ),
                       );
                     } else if (state is CategoriesLoaded) {
-                      return TopCategoriesSection(
-                        categories: state.categories,
-                        onViewMoreTap: (){
-                          context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
-                        },
-                        onCategoryTap: (category) {
-                          context.push(
-                            '/products/${category.categoryId}?name=${Uri.encodeComponent(category.name)}',
-                          );
-                        },
+                      return Column(
+                        children: [
+                          TopCategoriesSection(
+                            categories: state.categories,
+                            onViewMoreTap: (){
+                              context.read<TabNavigationBloc>().add(const TabChangedEvent(1));
+                            },
+                            onCategoryTap: (category) {
+                              context.push(
+                                '/products/${category.categoryId}?name=${Uri.encodeComponent(category.name)}',
+                              );
+                            },
+                          ),
+                          const PopularServicesSection(),
+                        ],
                       );
-                    } else if (state is HomeError) {
+                    } else if (state is PopularServiceDataLoaded) {
+                      return Column(
+                        children: [
+                          const PopularServicesSection(),
+                        ],
+                      );
+                    }else if (state is HomeError) {
                       return Center(
                         child: Padding(
                           padding: const EdgeInsets.all(40),
@@ -208,7 +226,8 @@ class _HomeScreenContentState extends State<_HomeScreenContent> {
 
 
                       // Popular Services
-                      const PopularServicesSection(),
+
+                  // From anywhere in your app
 
                       // Why Tez Health
                       // const WhyTezHealthSection(),

@@ -1,38 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import '../../../theme/app_colors.dart';
-import '../../cubit/store/store_bloc.dart';
-import '../../cubit/store/store_event.dart';
-import '../../cubit/store/store_state.dart';
-import '../../widgets/common/product_card.dart';
 import '../../widgets/common/menu_drawer.dart';
 
 class StoreScreen extends StatelessWidget {
   const StoreScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const _StoreScreenContent();
-  }
-}
-
-class _StoreScreenContent extends StatefulWidget {
-  const _StoreScreenContent();
-
-  @override
-  State<_StoreScreenContent> createState() => _StoreScreenContentState();
-}
-
-class _StoreScreenContentState extends State<_StoreScreenContent> {
-  final TextEditingController _searchController = TextEditingController();
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,15 +27,6 @@ class _StoreScreenContentState extends State<_StoreScreenContent> {
         ),
         centerTitle: false,
         actions: [
-          IconButton(
-            icon: Icon(
-              Icons.shopping_cart_outlined,
-              size: 24.sp,
-            ),
-            onPressed: () {
-              // TODO: Navigate to cart
-            },
-          ),
           Builder(
             builder: (context) => IconButton(
               icon: const Icon(Icons.menu),
@@ -74,163 +38,74 @@ class _StoreScreenContentState extends State<_StoreScreenContent> {
         ],
       ),
       endDrawer: const MenuDrawer(),
-      body: Column(
-        children: [
-          // Search Bar
-          Padding(
-            padding: EdgeInsets.all(16.w),
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                context.read<StoreBloc>().add(SearchStoreProductsEvent(value));
-              },
-              decoration: InputDecoration(
-                hintText: 'Search products...',
-                hintStyle: TextStyle(
-                  color: AppColors.gray400,
-                  fontSize: 14.sp,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: AppColors.gray400,
-                  size: 20.sp,
-                ),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: AppColors.gray400,
-                          size: 20.sp,
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
-                          context
-                              .read<StoreBloc>()
-                              .add(const SearchStoreProductsEvent(''));
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: AppColors.gray50,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.r),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 12.h,
-                ),
-              ),
-            ),
-          ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 32.w),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 40.h),
 
-          // Products Grid
-          Expanded(
-            child: BlocBuilder<StoreBloc, StoreState>(
-              builder: (context, state) {
-                if (state.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
+                // Coming Soon Image
+                Image.asset(
+                  'assets/images/work-in-progress.png', // Update this path
+                  width: 300.w,
+                  height: 300.w,
+                  fit: BoxFit.contain,
+                ),
+                SizedBox(height: 48.h),
 
-                if (state.errorMessage != null) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.error_outline,
-                          size: 64.sp,
-                          color: AppColors.gray400,
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          state.errorMessage!,
-                          style: TextStyle(
-                            color: AppColors.gray600,
-                            fontSize: 14.sp,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        SizedBox(height: 16.h),
-                        ElevatedButton(
-                          onPressed: () {
-                            context
-                                .read<StoreBloc>()
-                                .add(const LoadStoreEvent());
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.tezBlue,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 24.w,
-                              vertical: 12.h,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.r),
-                            ),
-                          ),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                if (state.filteredProducts.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.shopping_bag_outlined,
-                          size: 64.sp,
-                          color: AppColors.gray400,
-                        ),
-                        SizedBox(height: 16.h),
-                        Text(
-                          state.searchQuery.isNotEmpty
-                              ? 'No products found'
-                              : 'No products available',
-                          style: TextStyle(
-                            color: AppColors.gray600,
-                            fontSize: 14.sp,
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return RefreshIndicator(
-                  onRefresh: () async {
-                    context.read<StoreBloc>().add(const RefreshStoreEvent());
-                  },
-                  child: GridView.builder(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 12.w,
-                      mainAxisSpacing: 12.h,
-                      childAspectRatio: 0.7,
-                    ),
-                    itemCount: state.filteredProducts.length,
-                    itemBuilder: (context, index) {
-                      final product = state.filteredProducts[index];
-                      return ProductCard(
-                        product: product,
-                        onTap: () {
-                          context.push('/product-details/${product.productId}');
-                        },
-                      );
-                    },
+                // Description Text
+                Text(
+                  'Order medicines from your nearest medical store and get delivered in 30 minutes.',
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    color: AppColors.gray700,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
                   ),
-                );
-              },
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40.h),
+
+                // Back to Home Page Button
+                OutlinedButton.icon(
+                  onPressed: () {
+                    context.go('/');
+                  },
+                  icon: Icon(
+                    Icons.home_outlined,
+                    size: 20.sp,
+                    color: const Color(0xFF4A5568),
+                  ),
+                  label: Text(
+                    'Back to Home Page',
+                    style: TextStyle(
+                      fontSize: 15.sp,
+                      color: const Color(0xFF4A5568),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  style: OutlinedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 28.w,
+                      vertical: 16.h,
+                    ),
+                    side: const BorderSide(
+                      color: Color(0xFFD1D5DB),
+                      width: 1.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.r),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40.h),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }

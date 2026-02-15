@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -11,6 +13,7 @@ import '../../cubit/product/product_event.dart';
 import '../../cubit/product/product_state.dart';
 import '../../../models/product_variant.dart';
 import '../../../models/product.dart';
+import 'book_now_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final String productId;
@@ -144,11 +147,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
 
                     // Related Services Section
-                    if (state.relatedProducts.isNotEmpty)
-                      _RelatedServicesSection(
-                        relatedProducts: state.relatedProducts,
-                      ),
-
+                    // if (state.relatedProducts.isNotEmpty)
+                    //   _RelatedServicesSection(
+                    //     relatedProducts: state.relatedProducts,
+                    //   ),
+                    _RelatedServicesSection(
+                      relatedProducts: state.product.relatedProducts,
+                    ),
                     // Add space for footer button
                     const SizedBox(height: 80),
                   ],
@@ -199,7 +204,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     height: 50,
                     child: ElevatedButton(
                       onPressed: () {
-                        context.push('/book-now/${widget.productId}');
+                        // context.push('/book-now/${widget.productId}');
+                        buildShowDialog(context, widget.productId);
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(
@@ -223,6 +229,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 }
 
+Future<dynamic> buildShowDialog(BuildContext context,String productId) {
+  return showDialog(
+    context: context,
+    barrierColor: Colors.black.withValues(alpha: 0.8),
+    builder: (context) {
+      return BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6), // blur strength
+
+        child: Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 3),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: SizedBox(
+        height: MediaQuery.of(context).size.height*0.75,
+              child: BookNowScreen(productId: productId,)),
+        ),
+      );
+    },
+  );
+}
 // Rest of the classes remain the same...
 class _VariantOption extends StatelessWidget {
   final ProductVariant variant;
@@ -336,7 +363,7 @@ class _ServiceDetailsSectionState extends State<_ServiceDetailsSection> {
 }
 
 class _RelatedServicesSection extends StatelessWidget {
-  final List<Product> relatedProducts;
+  final List<RelatedProduct> relatedProducts;
 
   const _RelatedServicesSection({
     required this.relatedProducts,
@@ -386,13 +413,13 @@ class _RelatedServicesSection extends StatelessWidget {
 }
 
 class _RelatedServiceCard extends StatelessWidget {
-  final Product product;
+  final RelatedProduct product;
 
   const _RelatedServiceCard({required this.product});
 
   @override
   Widget build(BuildContext context) {
-    final firstVariant = product.firstVariant;
+    // final firstVariant = product.firstVariant;
 
     return Card(
       elevation: 2,
@@ -441,14 +468,14 @@ class _RelatedServiceCard extends StatelessWidget {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const Spacer(),
-                    if (firstVariant != null)
-                      Text(
-                        '₹${firstVariant.discountPrice.toStringAsFixed(0)}',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                    // const Spacer(),
+                    // if (firstVariant != null)
+                    //   Text(
+                    //     '₹${firstVariant.discountPrice.toStringAsFixed(0)}',
+                    //     style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    //       fontWeight: FontWeight.bold,
+                    //     ),
+                    //   ),
                   ],
                 ),
               ),

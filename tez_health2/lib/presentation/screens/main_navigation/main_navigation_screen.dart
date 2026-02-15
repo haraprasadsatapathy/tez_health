@@ -16,6 +16,7 @@ import '../../cubit/store/store_event.dart';
 import '../home/home_screen.dart';
 import '../categories/categories_screen.dart';
 import '../store/store_screen.dart';
+import '../tez_plus/tez_plus_screen.dart';
 
 class MainNavigationScreen extends StatelessWidget {
   const MainNavigationScreen({super.key});
@@ -58,8 +59,9 @@ class _MainNavigationScreenContentState
   final List<Widget> _screens = const [
     HomeScreen(),
     CategoriesScreen(),
-    StoreScreen(),
+    TezPlusScreen(),
   ];
+
 
   @override
   Widget build(BuildContext context) {
@@ -109,9 +111,9 @@ class _MainNavigationScreenContentState
                     _buildNavItem(
                       context: context,
                       index: 2,
-                      icon: Icons.store_outlined,
-                      activeIcon: Icons.store,
-                      label: 'Store',
+                      icon: Icons.verified_user_outlined,
+                      activeIcon: Icons.verified_user_rounded,
+                      label: 'Tez plus',
                       currentIndex: state.currentTabIndex,
                     ),
                   ],

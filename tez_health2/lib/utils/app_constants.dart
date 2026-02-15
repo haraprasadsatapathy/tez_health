@@ -4,6 +4,7 @@ class AppConstants {
 
   // API Endpoints
   static const String fetchCategoriesEndpoint = 'tez/FetchCategoryDetails';
+  static const String fetchPopularServiceEndpoint = 'tez/FetchPopularProducts';
   static const String fetchProductsEndpoint = 'tez/FetchProductsDetails';
   static const String fetchProductsByCategoryEndpoint = 'tez/FetchProductsByCategory';
   static const String fetchProductDetailsByIdEndpoint = 'tez/FetchProductsDetailsById';

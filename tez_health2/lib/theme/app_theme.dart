@@ -209,6 +209,7 @@ class AppTheme {
       ),
       titleSmall: GoogleFonts.outfit(
         fontSize: 14,
+        letterSpacing: 0,
         height: 20 / 14,
         fontWeight: FontWeight.w500,
         color: AppColors.gray50,

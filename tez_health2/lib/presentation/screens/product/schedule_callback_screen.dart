@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../theme/app_colors.dart';
-import '../../../config/dependency_injection.dart';
-import '../../../domain/repository/tez_repository.dart';
-import '../../cubit/callback/callback_bloc.dart';
-import '../../cubit/callback/callback_event.dart';
-import '../../cubit/callback/callback_state.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ScheduleCallbackScreen extends StatefulWidget {
   final String productId;
@@ -22,11 +17,14 @@ class ScheduleCallbackScreen extends StatefulWidget {
 }
 
 class _ScheduleCallbackScreenState extends State<ScheduleCallbackScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
-  final _mobileController = TextEditingController();
+
+  // ======== CONTROLLERS ========
+  final _formKey        = GlobalKey<FormState>();
+  final _nameController     = TextEditingController();
+  final _mobileController   = TextEditingController();
   final _locationController = TextEditingController();
   DateTime? _selectedDate;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -36,290 +34,216 @@ class _ScheduleCallbackScreenState extends State<ScheduleCallbackScreen> {
     super.dispose();
   }
 
+  // ======== FORMAT DATE ========
   String _formatDate(DateTime date) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
-    ];
+    final months = ['Jan','Feb','Mar','Apr','May','Jun',
+      'Jul','Aug','Sep','Oct','Nov','Dec'];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  // ======== DATE PICKER ========
+  Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppColors.tezBlue,
-              onPrimary: Colors.white,
-              onSurface: Colors.black,
-            ),
-          ),
-          child: child!,
-        );
-      },
     );
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-      });
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
     }
   }
 
-  void _submitForm(BuildContext context) {
-    if (_formKey.currentState!.validate()) {
-      if (_selectedDate == null) {
+  // ======== API CALL ========
+  Future<void> _submitForm() async {
+
+    // Check form valid
+    if (!_formKey.currentState!.validate()) return;
+
+    // Check date selected
+    if (_selectedDate == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('⚠️ Please select a date!'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true); // Show loader
+
+    try {
+      // ========= API POST REQUEST =========
+      final response = await http.post(
+        Uri.parse('https://your-api.com/schedule-callback'), // 👈 CHANGE THIS URL
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'product_id'    : widget.productId,
+          'product_name'  : widget.productName,
+          'name'          : _nameController.text,
+          'mobile'        : _mobileController.text,
+          'location'      : _locationController.text,
+          'preferred_date': '${_selectedDate!.year}-${_selectedDate!.month}-${_selectedDate!.day}',
+        }),
+      );
+      // ====================================
+
+      setState(() => _isLoading = false); // Hide loader
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // ✅ SUCCESS
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please select a date'),
+            content: Text('✅ Callback Scheduled Successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Future.delayed(const Duration(seconds: 2), () {
+          if (context.mounted) Navigator.pop(context);
+        });
+
+      } else {
+        // ❌ FAILED
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ Failed! Code: ${response.statusCode}'),
             backgroundColor: Colors.red,
           ),
         );
-        return;
       }
 
-      // Dispatch schedule callback event to BLoC
-      context.read<CallbackBloc>().add(
-            ScheduleCallbackEvent(
-              productId: widget.productId,
-              productName: widget.productName,
-              name: _nameController.text,
-              mobile: _mobileController.text,
-              location: _locationController.text,
-              preferredDate: _selectedDate!,
-            ),
-          );
+    } catch (e) {
+      setState(() => _isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('❌ Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
+  // ======== UI ========
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CallbackBloc(getIt<TezRepository>()),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Schedule Callback'),
-        ),
-        body: BlocListener<CallbackBloc, CallbackState>(
-          listener: (context, state) {
-            if (state is CallbackSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.green,
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Schedule Callback'),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // ===== TITLE =====
+              const Text('Request a Callback',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
                 ),
-              );
-              // Navigate back after showing success message
-              Future.delayed(const Duration(seconds: 2), () {
-                if (context.mounted) {
-                  Navigator.pop(context);
-                }
-              });
-            } else if (state is CallbackError) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.message),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          child: BlocBuilder<CallbackBloc, CallbackState>(
-            builder: (context, state) {
-              final isLoading = state is CallbackLoading;
-
-              return SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Informational text at the top
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.tezBlue.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(
-                            color: AppColors.tezBlue.withValues(alpha: 0.3),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.info_outline,
-                              color: AppColors.tezBlue,
-                              size: 24,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Expert Consultation',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium
-                                        ?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.tezBlue,
-                                        ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Our healthcare experts are available to help you understand the service better and answer all your queries.',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .bodySmall
-                                        ?.copyWith(
-                                          color: AppColors.gray700,
-                                        ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-
-                      // Header
-                      Text(
-                        'Request a Callback',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.tezBlue,
-                            ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Fill in your details and our experts will call you back within 2 hours.',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppColors.gray600,
-                            ),
-                      ),
-                      const SizedBox(height: 24),
-
-              // Name Field
-              Text(
-                'Name',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
               ),
               const SizedBox(height: 8),
+              const Text(
+                'Fill in your details and our experts will call you back within 2 hours.',
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+
+              // ===== NAME =====
+              const Text('Name',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              const SizedBox(height: 6),
               TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
                   hintText: 'Enter your full name',
                   prefixIcon: const Icon(Icons.person_outline),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.gray300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.tezBlue, width: 2),
-                  ),
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your name';
+                    return '⚠️ Name is required';
                   }
-                  return null;
+                  if (value.length < 3) {
+                    return '⚠️ Name min 3 characters';
+                  }
+                  if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
+                    return '⚠️ Name only letters allowed';
+                  }
+                  return null; // ✅ valid
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
-              // Service Field (Pre-filled)
-              Text(
-                'Service',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 8),
+              // ===== SERVICE =====
+              const Text('Service',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              const SizedBox(height: 6),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.gray100,
+                  color: Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.gray300),
+                  border: Border.all(color: Colors.blue.shade100),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.medical_services_outlined, color: AppColors.tezBlue),
+                    const Icon(Icons.medical_services_outlined, color: Colors.blue),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        widget.productName,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              fontWeight: FontWeight.w500,
-                            ),
-                      ),
-                    ),
+                    Text(widget.productName,
+                        style: const TextStyle(fontSize: 15)),
                   ],
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
-              // Date Field
-              Text(
-                'Preferred Date',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 8),
-              InkWell(
-                onTap: () => _selectDate(context),
+              // ===== DATE =====
+              const Text('Preferred Date',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              const SizedBox(height: 6),
+              GestureDetector(
+                onTap: _selectDate,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    border: Border.all(color: AppColors.gray300),
                     borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade400),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.calendar_today_outlined, color: AppColors.gray600),
+                      Icon(Icons.calendar_today_outlined,
+                          color: Colors.grey.shade600),
                       const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          _selectedDate == null
-                              ? 'Select a date'
-                              : _formatDate(_selectedDate!),
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                color: _selectedDate == null
-                                    ? AppColors.gray400
-                                    : Colors.black,
-                              ),
+                      Text(
+                        _selectedDate == null
+                            ? 'Select a date'
+                            : _formatDate(_selectedDate!),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: _selectedDate == null
+                              ? Colors.grey
+                              : Colors.black,
                         ),
                       ),
-                      Icon(Icons.arrow_drop_down, color: AppColors.gray600),
+                      const Spacer(),
+                      Icon(Icons.arrow_drop_down,
+                          color: Colors.grey.shade600),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
-              // Mobile Field
-              Text(
-                'Mobile Number',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 8),
+              // ===== MOBILE =====
+              const Text('Mobile Number',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              const SizedBox(height: 6),
               TextFormField(
                 controller: _mobileController,
                 keyboardType: TextInputType.phone,
@@ -327,106 +251,81 @@ class _ScheduleCallbackScreenState extends State<ScheduleCallbackScreen> {
                   hintText: 'Enter your mobile number',
                   prefixIcon: const Icon(Icons.phone_outlined),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.gray300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.tezBlue, width: 2),
-                  ),
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your mobile number';
+                    return '⚠️ Mobile is required';
                   }
                   if (value.length != 10) {
-                    return 'Mobile number must be 10 digits';
+                    return '⚠️ Mobile must be 10 digits';
                   }
-                  return null;
+                  if (!RegExp(r'^[0-9]+$').hasMatch(value)) {
+                    return '⚠️ Only numbers allowed';
+                  }
+                  if (!value.startsWith('6') &&
+                      !value.startsWith('7') &&
+                      !value.startsWith('8') &&
+                      !value.startsWith('9')) {
+                    return '⚠️ Enter valid Indian mobile number';
+                  }
+                  return null; // ✅ valid
                 },
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 14),
 
-              // Location Field
-              Text(
-                'Location',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-              ),
-              const SizedBox(height: 8),
+              // ===== LOCATION =====
+              const Text('Location',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
+              const SizedBox(height: 6),
               TextFormField(
                 controller: _locationController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Enter your complete address',
                   prefixIcon: const Padding(
-                    padding: EdgeInsets.only(bottom: 60),
+                    padding: EdgeInsets.only(bottom: 40),
                     child: Icon(Icons.location_on_outlined),
                   ),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.gray300),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: AppColors.tezBlue, width: 2),
-                  ),
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your location';
+                    return '⚠️ Location is required';
                   }
-                  return null;
+                  if (value.length < 10) {
+                    return '⚠️ Enter complete address (min 10 characters)';
+                  }
+                  return null; // ✅ valid
                 },
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 24),
 
-                      // Submit Button
-                      SizedBox(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: isLoading ? null : () => _submitForm(context),
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                          child: isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white,
-                                    ),
-                                  ),
-                                )
-                              : Text(
-                                  'Schedule Callback',
-                                  style: Theme.of(context)
-                                      .textTheme
-                                      .titleMedium
-                                      ?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                ),
-                        ),
-                      ),
-                    ],
+              // ===== BUTTON =====
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
+                  onPressed: _isLoading ? null : _submitForm, // 👈 CALLS API
+                  child: _isLoading
+                      ? const CircularProgressIndicator(color: Colors.white)
+                      : const Text('Schedule Callback',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      )),
                 ),
-              );
-            },
+              ),
+
+            ],
           ),
         ),
       ),

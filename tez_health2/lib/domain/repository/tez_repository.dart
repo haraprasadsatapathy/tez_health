@@ -1,5 +1,6 @@
 import '../../data/api_client/api_client.dart';
 import '../../models/category.dart';
+import '../../models/popular_service_response.dart';
 import '../../models/product.dart';
 import '../../models/search_result.dart';
 import '../../models/booking_request.dart';
@@ -20,6 +21,20 @@ class TezRepository {
       if (data != null && data['objret'] != null) {
         final List<dynamic> categoriesJson = data['objret'];
         return categoriesJson.map((json) => Category.fromJson(json)).toList();
+      }
+      return [];
+    } catch (e) {
+      rethrow;
+    }
+  }
+  Future<List<PopularServiceData>> fetchPopularService() async {
+    try {
+      final response = await _apiClient.get(AppConstants.fetchPopularServiceEndpoint);
+      final data = response.data;
+
+      if (data != null && data['objret'] != null) {
+        final List<dynamic> categoriesJson = data['objret'];
+        return categoriesJson.map((json) => PopularServiceData.fromJson(json)).toList();
       }
       return [];
     } catch (e) {

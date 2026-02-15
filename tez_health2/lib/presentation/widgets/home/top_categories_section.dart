@@ -38,28 +38,23 @@ class TopCategoriesSection extends StatelessWidget {
                 alignment: Alignment.center,
                 child: Padding(
                   padding: const EdgeInsets.only(right: 16, bottom: 8),
-                  child: ElevatedButton(
+                  child: OutlinedButton(
                     onPressed: () => onViewMoreTap(),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue, // Your desired color
-                      foregroundColor: Colors.white,
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.blue,
+                      side: const BorderSide(color: Colors.blue, width: 1.5),
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8), // Square with slight rounding
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                      minimumSize: const Size(0, 32), // Reduced height
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: Text(
+                    child: const Text(
                       'View More',
                       style: TextStyle(fontSize: 14),
                     ),
                   ),
-                  // child: OutlinedButton(
-                  //   onPressed: () => onViewMoreTap(),
-                  //   style: OutlinedButton.styleFrom(
-                  //     shape:  StadiumBorder(side: BorderSide()),
-                  //   ),
-                  //   child: const Text('View More'),
-                  // ),
                 ),
               ),
             ],

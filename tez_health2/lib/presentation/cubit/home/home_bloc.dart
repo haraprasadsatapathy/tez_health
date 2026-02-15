@@ -9,6 +9,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc(this._repository) : super(const HomeInitial()) {
     on<FetchCategoriesEvent>(_onFetchCategories);
     on<SearchProductsEvent>(_onSearchProducts);
+    // on<FetchPopularServiceEvent>(_onPopularService);
   }
 
   Future<void> _onFetchCategories(
@@ -18,7 +19,21 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     try {
       emit(const HomeLoading());
       final categories = await _repository.fetchCategories();
-      emit(CategoriesLoaded(categories));
+      final popularService = await _repository.fetchPopularService();
+      emit(CategoriesLoaded(categories,popularService));
+    } catch (e) {
+      emit(HomeError(e.toString()));
+    }
+  }
+
+  Future<void> _onPopularService(
+    FetchPopularServiceEvent event,
+    Emitter<HomeState> emit,
+  ) async {
+    try {
+      emit(const HomeLoading());
+      final popularService = await _repository.fetchPopularService();
+      emit(PopularServiceDataLoaded(popularService));
     } catch (e) {
       emit(HomeError(e.toString()));
     }

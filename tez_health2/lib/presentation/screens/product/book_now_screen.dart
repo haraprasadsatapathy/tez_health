@@ -18,44 +18,47 @@ class BookNowScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return buildBlocProvider();
+  }
+
+
+
+
+  BlocProvider<ProductBloc> buildBlocProvider() {
     return BlocProvider(
-      create: (context) => ProductBloc(getIt<TezRepository>())
-        ..add(FetchProductByIdEvent(productId)),
-      child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Book Now'),
-        ),
-        body: BlocBuilder<ProductBloc, ProductState>(
-          builder: (context, state) {
-            if (state is ProductLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ProductLoaded) {
-              final product = state.product;
-              return _buildBookNowContent(context, product);
-            } else if (state is ProductError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(state.message),
-                    const SizedBox(height: 16),
-                    ElevatedButton(
-                      onPressed: () {
-                        context
-                            .read<ProductBloc>()
-                            .add(FetchProductByIdEvent(productId));
-                      },
-                      child: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              );
-            }
-            return const SizedBox.shrink();
-          },
-        ),
+    create: (context) => ProductBloc(getIt<TezRepository>())
+      ..add(FetchProductByIdEvent(productId)),
+    child:  BlocBuilder<ProductBloc, ProductState>(
+        builder: (context, state) {
+          if (state is ProductLoading) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (state is ProductLoaded) {
+            final product = state.product;
+            return _buildBookNowContent(context, product);
+          } else if (state is ProductError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(state.message),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      context
+                          .read<ProductBloc>()
+                          .add(FetchProductByIdEvent(productId));
+                    },
+                    child: const Text('Retry'),
+                  ),
+                ],
+              ),
+            );
+          }
+          return const SizedBox.shrink();
+        },
       ),
-    );
+
+  );
   }
 
   Widget _buildBookNowContent(BuildContext context, Product product) {
@@ -63,74 +66,77 @@ class BookNowScreen extends StatelessWidget {
       children: [
         Expanded(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Product Image Section
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: AspectRatio(
-                    aspectRatio: 16 / 9,
-                    child: CachedNetworkImage(
-                      imageUrl: product.imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
-                      placeholder: (context, url) => Container(
-                        color: AppColors.gray100,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        color: AppColors.gray100,
-                        child: Icon(
-                          Icons.image,
-                          size: 60,
-                          color: AppColors.gray400,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
+      Stack(
+      alignment: Alignment.topRight,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: CachedNetworkImage(
+              imageUrl: product.imageUrl,
+              fit: BoxFit.cover,
+              width: double.infinity,
+            ),
+          ),
+        ),
+
+        IconButton(
+          icon: const Icon(Icons.close, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
+    ),
                 const SizedBox(height: 32),
 
                 // Product Name
-                Text(
-                  product.name,
-                  style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.tezBlue,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        product.name,
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.tezBlue,
+                            ),
                       ),
-                ),
-                const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                // Product Description
-                Text(
-                  product.description,
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        height: 1.6,
+                      // Product Description
+                      Text(
+                        product.description,
+                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                          height: 1.6,
+                        ),
                       ),
-                ),
-                const SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                // Title
-                Text(
-                  'Speak to our Experts',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
+                      // Title
+                      Text(
+                        'Speak to our Experts',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                ),
-                const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                // Additional Info
-                Text(
-                  'Our healthcare experts are available to answer your questions and help you book the right service for your needs.',
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        height: 1.5,
-                        color: AppColors.gray700,
+                      // Additional Info
+                      Text(
+                        'Our healthcare experts are available to answer your questions and help you book the right service for your needs.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          height: 1.5,
+                          color: AppColors.gray700,
+                        ),
                       ),
+                    ],
+                  ),
                 ),
+
               ],
             ),
           ),
@@ -138,7 +144,7 @@ class BookNowScreen extends StatelessWidget {
 
         // Bottom Buttons Section
         Container(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(5),
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
             boxShadow: [
@@ -149,14 +155,12 @@ class BookNowScreen extends StatelessWidget {
               ),
             ],
           ),
-          child: Column(
+          child:Row(
             children: [
-              // Schedule Callback Button
-              SizedBox(
-                width: double.infinity,
+              // ── Schedule Callback ──────────────────────
+              Expanded(
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigate to schedule callback form
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -168,78 +172,74 @@ class BookNowScreen extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                    backgroundColor: const Color(0xFF1A6FE0),
+                    shadowColor: const Color(0xFF1A6FE0).withValues(alpha: 0.4),
+                    elevation: 6,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         'Schedule Callback',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleMedium
-                            ?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Response Time: 2 hours',
-                        style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: Colors.white.withValues(alpha: 0.9),
-                                ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-              const SizedBox(height: 12),
 
-              // Call Now Button
-              SizedBox(
-                width: double.infinity,
+              const SizedBox(width: 10),
+
+              // ── Call Now ───────────────────────────────
+              Expanded(
                 child: OutlinedButton(
                   onPressed: () {
-                    // Handle call now
-                    _showCallNowDialog(context);
+                    _makePhoneCall();   // 🔥 Direct call
                   },
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                     side: BorderSide(color: AppColors.tezBlue, width: 2),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(5),
                     ),
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.phone, color: AppColors.tezBlue),
-                          const SizedBox(width: 8),
+                          Icon(Icons.phone, color: AppColors.tezBlue, size: 18),
+                          const SizedBox(width: 6),
                           Text(
                             'Call Now',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  color: AppColors.tezBlue,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: AppColors.tezBlue,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ],
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Response Time: Immediate',
-                        style:
-                            Theme.of(context).textTheme.bodySmall?.copyWith(
-                                  color: AppColors.gray600,
-                                ),
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.gray600,
+                        ),
                       ),
                     ],
                   ),
@@ -253,10 +253,8 @@ class BookNowScreen extends StatelessWidget {
   }
 
   Future<void> _makePhoneCall() async {
-    final Uri phoneUri = Uri(scheme: 'tel', path: '+919343180000');
-    if (await canLaunchUrl(phoneUri)) {
-      await launchUrl(phoneUri);
-    }
+    final Uri phoneUri = Uri.parse('tel:+919343180000');
+    await launchUrl(phoneUri);
   }
 
   void _showCallNowDialog(BuildContext context) {

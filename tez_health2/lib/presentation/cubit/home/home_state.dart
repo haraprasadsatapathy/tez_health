@@ -1,3 +1,4 @@
+import '../../../models/popular_service_response.dart';
 import '../base_event_state.dart';
 import '../../../models/category.dart';
 import '../../../models/search_result.dart';
@@ -16,11 +17,19 @@ class HomeLoading extends HomeState {
 
 class CategoriesLoaded extends HomeState {
   final List<Category> categories;
+  final List<PopularServiceData> popularServiceData;
+  const CategoriesLoaded(this.categories,this.popularServiceData);
 
-  const CategoriesLoaded(this.categories);
+
+}
+
+class PopularServiceDataLoaded extends HomeState {
+  final List<PopularServiceData> popularServiceData;
+
+  const PopularServiceDataLoaded(this.popularServiceData);
 
   @override
-  List<Object?> get props => [categories];
+  List<Object?> get props => [PopularServiceData];
 }
 
 class SearchResultsLoaded extends HomeState {

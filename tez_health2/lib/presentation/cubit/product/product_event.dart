@@ -22,6 +22,6 @@ class FetchProductByIdEvent extends ProductEvent {
   List<Object?> get props => [productId];
 }
 
-class FetchAllProductsEvent extends ProductEvent {
-  const FetchAllProductsEvent();
-}
+// class FetchAllProductsEvent extends ProductEvent {
+//   const FetchAllProductsEvent();
+// }
